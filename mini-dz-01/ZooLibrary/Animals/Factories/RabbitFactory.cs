@@ -2,11 +2,11 @@ using System;
 
 namespace ZooLibrary.Animals.Factories
 {
-    public class MonkeyFactory : AnimalFactoryBase<Monkey>
+    public class RabbitFactory : AnimalFactoryBase<Rabbit>
     {
         public override Animal CreateAnimal(int food, int number, bool isHealthy)
         {
-            return new Monkey(food, number, isHealthy, 3);
+            return new Rabbit(food, number, isHealthy, 7);
         }
     }
 }
