@@ -1,0 +1,28 @@
+namespace ZooLibrary.Animals
+{
+    /// <summary>
+    /// Класс, описывающий обезьяну.
+    /// </summary>
+    public class Monkey : Herbo
+    {
+        /// <summary>
+        /// Создает объект обезьяны.
+        /// </summary>
+        /// <param name="food">Количество еды, потребляемое в сутки.</param>
+        /// <param name="number">Номер инвентаризационной записи.</param>
+        /// <param name="isHealthy">Признак здоровья обезьяны.</param>
+        public Monkey(int food, int number, bool isHealthy, int kindness)
+            : base(food, number, isHealthy, kindness)
+        {
+        }
+
+        /// <summary>
+        /// Особое поведение обезьяны.
+        /// </summary>
+        public void Climb()
+        {
+            // Логика для обезьян – функция "лазать".
+            System.Console.WriteLine("Обезьяна быстро лазит по деревьям.");
+        }
+    }
+}
