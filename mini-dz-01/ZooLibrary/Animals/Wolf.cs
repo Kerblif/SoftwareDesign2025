@@ -3,6 +3,7 @@ namespace ZooLibrary.Animals
     /// <summary>
     /// Класс, описывающий волка.
     /// </summary>
+    [AnimalName("Волк")]
     public class Wolf : Predator
     {
         /// <summary>

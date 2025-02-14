@@ -1,4 +1,4 @@
-using ZooLibrary.Interfaces;
+using ZooLibrary.Things;
 
 namespace ZooLibrary.Animals
 {

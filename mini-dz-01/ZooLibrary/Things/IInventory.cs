@@ -1,4 +1,4 @@
-namespace ZooLibrary.Interfaces
+namespace ZooLibrary.Things
 {
     /// <summary>
     /// Интерфейс для описания инвентаризационной единицы.

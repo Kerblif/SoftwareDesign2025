@@ -1,5 +1,8 @@
-﻿using Spectre.Console;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Spectre.Console;
 using ZooLibrary.Animals;
+using ZooLibrary.Animals.Factories;
+using ZooLibrary.Services;
 using ZooLibrary.ZooEntities;
 using ZooLibrary.Things;
 
@@ -10,10 +13,12 @@ namespace ZooConsoleApp
 {
     public class Program
     {
-        private static Zoo _zoo = new();
+        private static Zoo _zoo = null!;
 
-        public static void Main(string[] args)
+        public static void Main()
         {
+            _zoo = AppServices.Services.GetRequiredService<Zoo>();
+            
             AnsiConsole.Write(
                 new FigletText("Moscow Zoo")
                     .Color(Color.Green));
@@ -54,51 +59,66 @@ namespace ZooConsoleApp
 
         private static void AddAnimal()
         {
-            var species = AnsiConsole.Prompt(
+            var animalsRegistry = AppServices.Services.GetRequiredService<AnimalNameRegistry>();
+            var factoryRegistry = AppServices.Services.GetRequiredService<AnimalFactoryRegistry>();
+
+            var species = animalsRegistry.GetAnimalNames().ToList();
+
+            if (!species.Any())
+            {
+                AnsiConsole.MarkupLine("[red]Ошибка: ни одна фабрика животных не зарегистрирована![/]");
+                return;
+            }
+            
+            var selectedSpecies= AnsiConsole.Prompt(
                 new SelectionPrompt<string>()
                     .Title("Выберите [green]вид животного[/]:")
-                    .AddChoices("Обезьяна", "Кролик"));
+                    .AddChoices(species)); // Получаем список зарегистрированных видов
 
             var food = AnsiConsole.Ask<int>("Сколько [green]килограммов еды[/] нужно этому животному в день?");
             var number = AnsiConsole.Ask<int>("Введите [green]инвентарный номер[/]:");
             var isHealthy = AnsiConsole.Confirm("Это животное [green]здорово[/]?");
 
-            Animal animal;
-            try
+            var factory = factoryRegistry.GetFactory(selectedSpecies);
+            if (factory == null)
             {
-                animal = species switch
-                {
-                    "Обезьяна" => new Monkey(
-                        food,
-                        number,
-                        isHealthy,
-                        AnsiConsole.Ask<int>("Введите [green]уровень доброты[/] (0-10):")),
-                    "Кролик" => new Rabbit(
-                        food,
-                        number,
-                        isHealthy,
-                        AnsiConsole.Ask<int>("Введите [green]уровень доброты[/] (0-10):")),
-                    _ => throw new InvalidOperationException()
-                };
-            }
-            catch (InvalidOperationException)
-            {
-                AnsiConsole.MarkupLine("[red]Ошибка: произошла недопустимая операция.[/]");
+                AnsiConsole.MarkupLine("[red]Ошибка: фабрика для данного вида животных не найдена.[/]");
                 return;
             }
-            catch (ArgumentException)
+
+            Animal animal;
+
+            try
             {
-                AnsiConsole.MarkupLine("[red]Ошибка: недопустимый аргумент. Проверьте введенные данные.[/]");
+                animal = factory.CreateAnimal(food, number, isHealthy);
+
+                if (animal is Herbo herbo)
+                {
+                    var kindness = AnsiConsole.Prompt(
+                        new TextPrompt<int>("Введите [green]уровень доброты[/] (0-10):")
+                            .Validate((n) => n switch
+                            {
+                                < 0 => ValidationResult.Error("Слишком низкий уровень доброты"),
+                                > 50 => ValidationResult.Error("Слишком высокий уровень доброты"),
+                                _ => ValidationResult.Success()
+                            })
+                            .DefaultValue(herbo.Kindness));
+                    herbo.Kindness = kindness;
+                }
+            }
+            catch (ArgumentException ex)
+            {
+                AnsiConsole.MarkupLine($"[red]Ошибка создания животного: {ex.Message}[/]");
                 return;
             }
 
             if (_zoo.TryAddAnimal(animal))
             {
-                AnsiConsole.MarkupLine($"[green]Животное добавлено успешно![/]");
+                AnsiConsole.MarkupLine($"[green]Животное успешно добавлено![/]");
             }
             else
             {
-                AnsiConsole.MarkupLine($"[red]Животное не прошло проверку здоровья.[/]");
+                AnsiConsole.MarkupLine($"[red]Животное не прошло проверку здоровья и не было добавлено.[/]");
             }
         }
 

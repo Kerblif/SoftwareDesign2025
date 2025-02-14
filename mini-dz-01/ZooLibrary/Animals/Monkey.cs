@@ -3,6 +3,7 @@ namespace ZooLibrary.Animals
     /// <summary>
     /// Класс, описывающий обезьяну.
     /// </summary>
+    [AnimalName("Обезьяна")]
     public class Monkey : Herbo
     {
         /// <summary>

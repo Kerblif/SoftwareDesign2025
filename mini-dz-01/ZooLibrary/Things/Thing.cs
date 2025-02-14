@@ -1,5 +1,3 @@
-using ZooLibrary.Interfaces;
-
 namespace ZooLibrary.Things
 {
     /// <summary>

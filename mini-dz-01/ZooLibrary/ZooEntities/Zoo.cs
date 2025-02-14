@@ -8,6 +8,14 @@ namespace ZooLibrary.ZooEntities
     /// </summary>
     public class Zoo
     {
+        private static readonly Lazy<Zoo> _instance = new Lazy<Zoo>(() => new Zoo());
+
+        private Zoo()
+        {
+        }
+        
+        public static Zoo Instance => _instance.Value;
+        
         public List<Animal> Animals { get; set; } = new();
         public List<Thing> Inventory { get; set; } = new();
         public VetClinic Clinic { get; set; } = new();

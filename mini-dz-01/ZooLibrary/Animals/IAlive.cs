@@ -1,4 +1,4 @@
-namespace ZooLibrary.Interfaces
+namespace ZooLibrary.Animals
 {
     /// <summary>
     /// Интерфейс, представляющий живое существо.
