@@ -18,14 +18,14 @@ namespace ZooLibrary.ZooEntities
         
         public List<Animal> Animals { get; set; } = new();
         public List<Thing> Inventory { get; set; } = new();
-        public VetClinic Clinic { get; set; } = new();
+        public IAnimalChecker Clinic { get; set; } = new VetClinic();
 
         /// <summary>
         /// Попытаться добавить животное в зоопарк (через проверку клиники).
         /// </summary>
         public bool TryAddAnimal(Animal animal)
         {
-            if (Clinic.CheckAnimal(animal))
+            if (Clinic.Check(animal))
             {
                 Animals.Add(animal);
                 return true;

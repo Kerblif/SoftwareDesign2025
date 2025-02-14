@@ -5,9 +5,9 @@ namespace ZooLibrary.ZooEntities
     /// <summary>
     /// Класс, описывающий ветеринарную клинику.
     /// </summary>
-    public class VetClinic
+    public class VetClinic: IAnimalChecker
     {
-        public bool CheckAnimal(Animal animal)
+        public bool Check(Animal animal)
         {
             // Проверка здоровья. Написан простой пример.
             return animal.IsHealthy;

@@ -36,6 +36,8 @@ namespace ZooLibrary.Services
 
             services.AddSingleton(AnimalFactoryRegistry.Instance);
             services.AddSingleton(AnimalNameRegistry.Instance);
+            
+            services.AddSingleton<IAnimalChecker, VetClinic>();
             services.AddSingleton(Zoo.Instance);
 
             return services.BuildServiceProvider();
