@@ -16,14 +16,5 @@ namespace ZooLibrary.Animals
             : base(food, number, isHealthy)
         {
         }
-
-        /// <summary>
-        /// Привычка волка выть.
-        /// </summary>
-        public void Howl()
-        {
-            // Логика для волка – функция "выть".
-            System.Console.WriteLine("Волк воет на полную луну.");
-        }
     }
 }

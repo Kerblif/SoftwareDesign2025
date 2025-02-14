@@ -16,14 +16,5 @@ namespace ZooLibrary.Animals
             : base(food, number, isHealthy, kindness)
         {
         }
-
-        /// <summary>
-        /// Особое поведение обезьяны.
-        /// </summary>
-        public void Climb()
-        {
-            // Логика для обезьян – функция "лазать".
-            System.Console.WriteLine("Обезьяна быстро лазит по деревьям.");
-        }
     }
 }
