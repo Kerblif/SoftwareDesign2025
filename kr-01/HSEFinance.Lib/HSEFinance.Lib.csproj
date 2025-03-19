@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Folder Include="Application\Analytics\" />
+      <Folder Include="Application\Commands\" />
+      <Folder Include="Application\Export\" />
+      <Folder Include="Application\Import\" />
+      <Folder Include="Core\Interfaces\" />
+      <Folder Include="Domain\Factories\" />
+      <Folder Include="Infrastructure\Data\Proxies\" />
+      <Folder Include="Infrastructure\DI\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="CsvHelper" Version="33.0.1" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.3" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.3" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.3">
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        <PrivateAssets>all</PrivateAssets>
+      </PackageReference>
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0-preview.2.25163.2" />
+      <PackageReference Include="YamlDotNet" Version="16.3.0" />
+    </ItemGroup>
+
+</Project>
