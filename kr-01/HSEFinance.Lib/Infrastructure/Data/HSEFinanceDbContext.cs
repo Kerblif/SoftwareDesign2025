@@ -34,7 +34,11 @@ namespace HSEFinance.Lib.Infrastructure.Data
             {
                 entity.HasKey(o => o.Id);
                 entity.Property(o => o.Type).IsRequired();
+                entity.Property(o => o.BankAccountId).IsRequired();
                 entity.Property(o => o.Amount).IsRequired();
+                entity.Property(o => o.Date).IsRequired();
+                entity.Property(o => o.Description).HasDefaultValue("");
+                entity.Property(o => o.CategoryId).IsRequired();
             });
 
             base.OnModelCreating(modelBuilder);

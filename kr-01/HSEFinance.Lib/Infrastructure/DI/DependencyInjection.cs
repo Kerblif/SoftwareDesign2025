@@ -1,4 +1,3 @@
-using HSEFinance.Lib.Application.Facades;
 using HSEFinance.Lib.Core;
 using HSEFinance.Lib.Domain.Factories;
 using HSEFinance.Lib.Domain.Repositories;
@@ -25,11 +24,6 @@ namespace HSEFinance.Lib.Infrastructure.DI
             services.AddScoped<IAccountRepository, AccountRepository>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
             services.AddScoped<IOperationRepository, OperationRepository>();
-
-            // Регистрация фасадов
-            services.AddScoped<BankAccountFacade>();
-            services.AddScoped<CategoryFacade>();
-            services.AddScoped<OperationFacade>();
 
             return services;
         }

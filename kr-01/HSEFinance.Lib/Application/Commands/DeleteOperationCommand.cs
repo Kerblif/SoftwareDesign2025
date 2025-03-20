@@ -1,21 +1,20 @@
-using HSEFinance.Lib.Application.Facades;
-
+using HSEFinance.Lib.Domain.Repositories;
 namespace HSEFinance.Lib.Application.Commands
 {
     public class DeleteOperationCommand : ICommand
     {
-        private readonly OperationFacade _operationFacade;
+        private readonly IOperationRepository _operationRepository;
         private readonly Guid _operationId;
 
-        public DeleteOperationCommand(OperationFacade operationFacade, Guid operationId)
+        public DeleteOperationCommand(IOperationRepository operationRepository, Guid operationId)
         {
-            _operationFacade = operationFacade;
+            _operationRepository = operationRepository;
             _operationId = operationId;
         }
 
         public void Execute()
         {
-            _operationFacade.DeleteOperation(_operationId);
+            _operationRepository.DeleteOperation(_operationId);
         }
     }
 }

@@ -1,82 +1,44 @@
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Spectre.Console;
+using HSEFinance.Lib.Core;
+using HSEFinance.Lib.Domain.Entities;
+using HSEFinance.Lib.Domain.Enums;
+using HSEFinance.Lib.Infrastructure.DI;
 
-class Program
+namespace HSEFinance.ConsoleApp
 {
-    static void Main()
+    class Program
     {
-        // Приветствие
-        AnsiConsole.Write(new FigletText("HSE Finance")
-           .Centered()
-           .Color(Color.Green));
-
-        // Основное меню
-        while (true)
+        static void Main(string[] args)
         {
-            var choice = AnsiConsole.Prompt(
-                new SelectionPrompt<string>()
-                    .Title("Выберите действие:")
-                    .AddChoices(new[]
-                    {
-                        "1. Просмотр счетов",
-                        "2. Добавление операций",
-                        "3. Аналитика",
-                        "4. Управление категориями",
-                        "5. Выход"
-                    }));
+            // Настройка DI контейнера
+            var serviceProvider = ConfigureServices();
 
-            switch (choice)
-            {
-                case "1. Просмотр счетов":
-                    ShowAccounts();
-                    break;
-                case "2. Добавление операций":
-                    AddOperation();
-                    break;
-                case "3. Аналитика":
-                    ShowAnalytics();
-                    break;
-                case "4. Управление категориями":
-                    ManageCategories();
-                    break;
-                case "5. Выход":
-                    AnsiConsole.Markup("[bold green]До скорой встречи![/]");
-                    return;
-                default:
-                    AnsiConsole.Markup("[red]Неверный выбор![/]");
-                    break;
-            }
+            using var scope = serviceProvider.CreateScope();
+            var app = scope.ServiceProvider.GetRequiredService<FinanceApp>();
+            
+            app.Run();
         }
-    }
 
-    static void ShowAccounts()
-    {
-        AnsiConsole.MarkupLine("[yellow]Просмотр счетов пока не реализован[/]");
-    }
+        private static IServiceProvider ConfigureServices()
+        {
+            var services = new ServiceCollection();
 
-    static void AddOperation()
-    {
-        // Пример добавления операции
-        AnsiConsole.MarkupLine("[yellow]> Добавление новой операции[/]");
-
-        var type = AnsiConsole.Prompt(
-            new SelectionPrompt<string>()
-                .Title("Тип операции:")
-                .AddChoices("Доход", "Расход"));
-
-        var amount = AnsiConsole.Ask<decimal>("Введите сумму операции:");
-        var description = AnsiConsole.Ask<string>("Введите описание операции (необязательно):");
-
-        // Объект операции
-        AnsiConsole.MarkupLine($"[green]Операция добавлена:[/] {type} на сумму {amount:C}. Описание: {description}");
-    }
-
-    static void ShowAnalytics()
-    {
-        AnsiConsole.MarkupLine("[blue]Аналитика пока не реализована[/]");
-    }
-
-    static void ManageCategories()
-    {
-        AnsiConsole.MarkupLine("[yellow]Управление категориями пока не реализовано[/]");
+            DependencyInjection.AddHSEFinanceServices(services, "Data Source=" + Environment.GetEnvironmentVariable("DATABASE_PATH"));
+                
+            // Регистрация фасадов
+            services.AddSingleton<AccountManagerFacade>();
+            services.AddSingleton<CategoryManagerFacade>();
+            services.AddSingleton<OperationManagerFacade>();
+            
+            // Регистрация приложения
+            services.AddSingleton<FinanceApp>();
+            
+            return services.BuildServiceProvider();
+        }
     }
 }

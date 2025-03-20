@@ -21,5 +21,7 @@ namespace HSEFinance.Lib.Domain.Entities
         {
             visitor.Visit(this);
         }
+        
+        override public string ToString() => Name;
     }
 }

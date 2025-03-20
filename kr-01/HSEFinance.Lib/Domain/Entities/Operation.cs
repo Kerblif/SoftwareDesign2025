@@ -12,7 +12,7 @@ namespace HSEFinance.Lib.Domain.Entities
         public decimal Amount { get; }
         public DateTime Date { get; }
         public string? Description { get; set; }
-        public Guid CategoryId { get; }
+        public Guid CategoryId { get; set; }
 
         public Operation(ItemType type, Guid bankAccountId, decimal amount, DateTime date, Guid categoryId, string? description = null)
         {
@@ -33,6 +33,11 @@ namespace HSEFinance.Lib.Domain.Entities
         public void Accept(IVisitor visitor)
         {
             visitor.Visit(this);
+        }
+
+        public override string ToString()
+        {
+            return $"Операция: {{ Тип: {Type}, Сумма: {Amount}, Дата: {Date}, Описание: {Description ?? "N/A"}, ID категории: {CategoryId}, ID счета: {BankAccountId} }}";
         }
     }
 }
