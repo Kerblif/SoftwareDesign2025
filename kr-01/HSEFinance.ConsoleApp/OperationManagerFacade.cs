@@ -188,6 +188,5 @@ namespace HSEFinance.ConsoleApp
                 AnsiConsole.MarkupLine($"[red]Ошибка редактирования операции: {ex.Message}[/]");
             }
         }
-
     }
 }

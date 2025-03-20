@@ -1,6 +1,5 @@
 using HSEFinance.Lib.Domain.Entities;
 using HSEFinance.Lib.Domain.Enums;
-using System;
 
 namespace HSEFinance.Lib.Domain.Repositories
 {

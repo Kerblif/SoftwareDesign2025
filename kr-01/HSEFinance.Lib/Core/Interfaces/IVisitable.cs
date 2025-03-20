@@ -1,4 +1,4 @@
-namespace HSEFinance.Lib.Core
+namespace HSEFinance.Lib.Core.Interfaces
 {
     public interface IVisitable
     {

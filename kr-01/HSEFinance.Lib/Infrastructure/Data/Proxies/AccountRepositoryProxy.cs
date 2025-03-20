@@ -1,9 +1,11 @@
+using HSEFinance.Lib.Core;
+using HSEFinance.Lib.Core.Interfaces;
 using HSEFinance.Lib.Domain.Entities;
 using HSEFinance.Lib.Domain.Repositories;
 
 namespace HSEFinance.Lib.Infrastructure.Data.Proxies
 {
-    public class AccountRepositoryProxy : IAccountRepository
+    public class AccountRepositoryProxy : IAccountRepository, IVisitable
     {
         private readonly IAccountRepository _repository;
         private readonly Dictionary<Guid, BankAccount> _cache = new();
@@ -64,6 +66,14 @@ namespace HSEFinance.Lib.Infrastructure.Data.Proxies
             _repository.UpdateBankAccount(account);
 
             _cache[account.Id] = account;
+        }
+        
+        public void Accept(IVisitor visitor)
+        {
+            foreach (var account in GetAllBankAccounts())
+            {
+                account.Accept(visitor);
+            }
         }
     }
 }

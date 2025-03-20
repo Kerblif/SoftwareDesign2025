@@ -34,6 +34,7 @@ namespace HSEFinance.ConsoleApp
             services.AddSingleton<AccountManagerFacade>();
             services.AddSingleton<CategoryManagerFacade>();
             services.AddSingleton<OperationManagerFacade>();
+            services.AddSingleton<AnalyticsFacade>();
             
             // Регистрация приложения
             services.AddSingleton<FinanceApp>();

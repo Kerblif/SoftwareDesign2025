@@ -8,12 +8,10 @@ namespace HSEFinance.ConsoleApp
 {
     public class AccountManagerFacade
     {
-        private readonly IBankAccountFactory _accountFactory;
         private readonly IAccountRepository _accountRepository;
 
-        public AccountManagerFacade(IBankAccountFactory accountFactory, IAccountRepository accountRepository)
+        public AccountManagerFacade(IAccountRepository accountRepository)
         {
-            _accountFactory = accountFactory;
             _accountRepository = new AccountRepositoryProxy(accountRepository);
         }
 

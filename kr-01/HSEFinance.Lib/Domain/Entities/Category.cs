@@ -1,6 +1,7 @@
 using HSEFinance.Lib.Domain.Enums;
 using HSEFinance.Lib.Domain.Interfaces;
 using HSEFinance.Lib.Core;
+using HSEFinance.Lib.Core.Interfaces;
 
 namespace HSEFinance.Lib.Domain.Entities
 {

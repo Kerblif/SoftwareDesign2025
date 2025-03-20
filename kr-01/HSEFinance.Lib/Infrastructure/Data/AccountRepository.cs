@@ -1,3 +1,4 @@
+using HSEFinance.Lib.Core;
 using HSEFinance.Lib.Domain.Entities;
 using HSEFinance.Lib.Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -46,6 +47,14 @@ namespace HSEFinance.Lib.Infrastructure.Data
         {
             _dbContext.BankAccounts.Update(account);
             _dbContext.SaveChanges();
+        }
+        
+        public void Accept(IVisitor visitor)
+        {
+            foreach (var account in GetAllBankAccounts())
+            {
+                account.Accept(visitor);
+            }
         }
     }
 }

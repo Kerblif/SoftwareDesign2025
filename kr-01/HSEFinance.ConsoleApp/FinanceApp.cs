@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using HSEFinance.Lib.Application.Analytics;
 using Spectre.Console;
 
 namespace HSEFinance.ConsoleApp
@@ -8,15 +9,14 @@ namespace HSEFinance.ConsoleApp
         private readonly AccountManagerFacade _accountFacade;
         private readonly CategoryManagerFacade _categoryFacade;
         private readonly OperationManagerFacade _operationFacade;
+        private readonly AnalyticsFacade _analyticsFacade;
 
-        public FinanceApp(
-            AccountManagerFacade accountFacade,
-            CategoryManagerFacade categoryFacade,
-            OperationManagerFacade operationFacade)
+        public FinanceApp(OperationManagerFacade operationManager, AccountManagerFacade accountManager, CategoryManagerFacade categoryManager, AnalyticsFacade analyticsFacade)
         {
-            _accountFacade = accountFacade;
-            _categoryFacade = categoryFacade;
-            _operationFacade = operationFacade;
+            _accountFacade = accountManager;
+            _categoryFacade = categoryManager;
+            _operationFacade = operationManager;
+            _analyticsFacade = analyticsFacade;
         }
 
         public void Run()
@@ -32,7 +32,7 @@ namespace HSEFinance.ConsoleApp
                 var choice = AnsiConsole.Prompt(
                     new SelectionPrompt<string>()
                         .Title("[green]Выберите действие:[/]")
-                        .AddChoices("Управление счетами", "Управление категориями", "Управление операциями", "Выйти"));
+                        .AddChoices("Управление счетами", "Управление категориями", "Управление операциями", "Аналитика", "Выйти"));
 
                 switch (choice)
                 {
@@ -44,6 +44,9 @@ namespace HSEFinance.ConsoleApp
                         break;
                     case "Управление операциями":
                         _operationFacade.ShowMenu();
+                        break;
+                    case "Аналитика":
+                        _analyticsFacade.ShowMenu();
                         break;
                     case "Выйти":
                         AnsiConsole.MarkupLine("[yellow]До свидания![/]");

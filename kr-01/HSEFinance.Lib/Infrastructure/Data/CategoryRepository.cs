@@ -1,3 +1,4 @@
+using HSEFinance.Lib.Core;
 using HSEFinance.Lib.Domain.Entities;
 using HSEFinance.Lib.Domain.Enums;
 using HSEFinance.Lib.Domain.Repositories;
@@ -47,6 +48,14 @@ namespace HSEFinance.Lib.Infrastructure.Data
         {
             _dbContext.Categories.Update(category);
             _dbContext.SaveChanges();
+        }
+        
+        public void Accept(IVisitor visitor)
+        {
+            foreach (var account in GetAllCategories())
+            {
+                account.Accept(visitor);
+            }
         }
     }
 }

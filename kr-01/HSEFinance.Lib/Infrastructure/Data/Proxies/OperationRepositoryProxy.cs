@@ -1,3 +1,4 @@
+using HSEFinance.Lib.Core;
 using HSEFinance.Lib.Domain.Entities;
 using HSEFinance.Lib.Domain.Enums;
 using HSEFinance.Lib.Domain.Repositories;
@@ -64,6 +65,14 @@ namespace HSEFinance.Lib.Infrastructure.Data.Proxies
         {
             _repository.UpdateOperation(operation);
             _cache[operation.Id] = operation;
+        }
+        
+        public void Accept(IVisitor visitor)
+        {
+            foreach (var account in GetAllOperations())
+            {
+                account.Accept(visitor);
+            }
         }
     }
 }

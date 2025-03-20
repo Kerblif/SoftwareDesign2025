@@ -6,6 +6,7 @@ using HSEFinance.Lib.Domain.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using HSEFinance.Lib.Core;
 
 namespace HSEFinance.Lib.Infrastructure.Data
 {
@@ -136,6 +137,14 @@ namespace HSEFinance.Lib.Infrastructure.Data
             existingOperation.Description = operation.Description;
             _dbContext.Operations.Update(existingOperation);
             _dbContext.SaveChanges();
+        }
+        
+        public void Accept(IVisitor visitor)
+        {
+            foreach (var account in GetAllOperations())
+            {
+                account.Accept(visitor);
+            }
         }
     }
 }

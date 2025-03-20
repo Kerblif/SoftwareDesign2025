@@ -1,4 +1,5 @@
 using HSEFinance.Lib.Core;
+using HSEFinance.Lib.Core.Interfaces;
 using HSEFinance.Lib.Domain.Enums;
 using HSEFinance.Lib.Domain.Interfaces;
 
