@@ -81,16 +81,19 @@ namespace HSEFinance.Lib.Infrastructure.Data.Proxies
 
         public void RecalculateAccountBalance(Guid accountId)
         {
-            _repository.RecalculateAccountBalance(accountId);
-            
-            var account = _repository.GetBankAccount(accountId);
-
-            if (account == null)
+            if (!_cache.TryGetValue(accountId, out var cachedAccount))
             {
-                throw new InvalidOperationException($"Bank account with ID {accountId} was not found.");
+                cachedAccount = _repository.GetBankAccount(accountId) 
+                                ?? throw new Exception($"Account with ID {accountId} not found.");
             }
-            
-            _cache[accountId] = account;
+
+            _repository.RecalculateAccountBalance(accountId);
+
+            var recalculatedBalance = _repository.GetBankAccount(accountId)?.Balance
+                                      ?? throw new Exception($"Failed to get recalculated balance for account {accountId}.");
+            cachedAccount.Balance = recalculatedBalance;
+
+            _cache[accountId] = cachedAccount;
         }
 
         public void Accept(IVisitor visitor)

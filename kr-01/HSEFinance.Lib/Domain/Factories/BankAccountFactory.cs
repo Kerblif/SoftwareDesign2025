@@ -7,6 +7,11 @@ namespace HSEFinance.Lib.Domain.Factories
     {
         public BankAccount Create(string? name)
         {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentException("The account name cannot be empty.");
+            }
+            
             return new BankAccount(name);
         }
     }

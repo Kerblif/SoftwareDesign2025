@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HSEFinance.Lib", "HSEFinanc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HSEFinance.ConsoleApp", "HSEFinance.ConsoleApp\HSEFinance.ConsoleApp.csproj", "{10F50D96-8185-441F-B0C8-EC97D6548EE8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HSEFinance.Lib.Test", "HSEFinance.Lib.Test\HSEFinance.Lib.Test.csproj", "{DEB03860-C5EF-4E4C-9DA5-CA1A6EB606F4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{10F50D96-8185-441F-B0C8-EC97D6548EE8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{10F50D96-8185-441F-B0C8-EC97D6548EE8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{10F50D96-8185-441F-B0C8-EC97D6548EE8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DEB03860-C5EF-4E4C-9DA5-CA1A6EB606F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DEB03860-C5EF-4E4C-9DA5-CA1A6EB606F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DEB03860-C5EF-4E4C-9DA5-CA1A6EB606F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DEB03860-C5EF-4E4C-9DA5-CA1A6EB606F4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

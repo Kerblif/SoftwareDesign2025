@@ -10,10 +10,12 @@ namespace HSEFinance.Lib.Infrastructure.Data
     public class CategoryRepository : ICategoryRepository
     {
         private readonly HSEFinanceDbContext _dbContext;
+        private readonly ICategoryFactory _categoryFactory;
 
-        public CategoryRepository(HSEFinanceDbContext dbContext)
+        public CategoryRepository(HSEFinanceDbContext dbContext, ICategoryFactory categoryFactory)
         {
             _dbContext = dbContext;
+            _categoryFactory = categoryFactory;
         }
 
         public IEnumerable<Category> GetAllCategories()
@@ -23,7 +25,7 @@ namespace HSEFinance.Lib.Infrastructure.Data
 
         public Category CreateCategory(ItemType type, string name)
         {
-            var category = new Category(type, name);
+            var category = _categoryFactory.Create(type, name);
             _dbContext.Categories.Add(category);
             _dbContext.SaveChanges();
             return category;

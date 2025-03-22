@@ -54,9 +54,9 @@ namespace HSEFinance.ConsoleApp
 
             _operationRepository.Accept(visitor);
 
-            AnsiConsole.MarkupLine($"[blue]Доходы:[/] {visitor.TotalIncome}");
-            AnsiConsole.MarkupLine($"[blue]Расходы:[/] {visitor.TotalExpense}");
-            AnsiConsole.MarkupLine($"[blue]Разница:[/] {visitor.CalculateDifference()}");
+            AnsiConsole.MarkupLine("[blue]Доходы:[/] {0}", visitor.TotalIncome);
+            AnsiConsole.MarkupLine("[blue]Расходы:[/] {0}", visitor.TotalExpense);
+            AnsiConsole.MarkupLine("[blue]Разница:[/] {0}", visitor.CalculateDifference());
         }
 
         private void ShowCategoryGrouping()
@@ -88,8 +88,8 @@ namespace HSEFinance.ConsoleApp
 
             _operationRepository.Accept(visitor);
 
-            AnsiConsole.MarkupLine($"[blue]Средний доход:[/] {visitor.GetAverageIncome():F2}");
-            AnsiConsole.MarkupLine($"[red]Средний расход:[/] {visitor.GetAverageExpense():F2}");
+            AnsiConsole.MarkupLine("[blue]Средний доход:[/] {0:F2}", visitor.GetAverageIncome());
+            AnsiConsole.MarkupLine("[red]Средний расход:[/] {0:F2}", visitor.GetAverageExpense());
         }
     }
 }

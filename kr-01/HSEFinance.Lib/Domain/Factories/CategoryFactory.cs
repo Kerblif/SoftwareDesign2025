@@ -8,6 +8,11 @@ namespace HSEFinance.Lib.Domain.Factories
     {
         public Category Create(ItemType type, string name)
         {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentException("Category name cannot be empty.");
+            }
+            
             return new Category(type, name);
         }
     }

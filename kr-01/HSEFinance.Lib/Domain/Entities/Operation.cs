@@ -17,6 +17,21 @@ namespace HSEFinance.Lib.Domain.Entities
 
         public Operation(ItemType type, Guid bankAccountId, decimal amount, DateTime date, Guid categoryId, string? description = null)
         {
+            if (amount < 0)
+            {
+                throw new ArgumentException("Operation amount cannot be negative.");
+            }
+
+            if (bankAccountId == Guid.Empty)
+            {
+                throw new ArgumentException("Bank account ID cannot be an empty GUID.");
+            }
+
+            if (categoryId == Guid.Empty)
+            {
+                throw new ArgumentException("Category ID cannot be an empty GUID.");
+            }
+            
             Id = Guid.NewGuid();
             Type = type;
             BankAccountId = bankAccountId;
@@ -24,11 +39,6 @@ namespace HSEFinance.Lib.Domain.Entities
             Date = date;
             Description = description;
             CategoryId = categoryId;
-
-            if (amount < 0)
-            {
-                throw new ArgumentException("Operation amount cannot be negative.");
-            }
         }
         
         public void Accept(IVisitor visitor)

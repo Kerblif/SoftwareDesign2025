@@ -77,11 +77,11 @@ namespace HSEFinance.ConsoleApp
                 // Создание категории в репозитории
                 _categoryRepository.CreateCategory(itemType, categoryName);
 
-                AnsiConsole.MarkupLine($"[green]Категория '{categoryName}' успешно добавлена![/]");
+                AnsiConsole.MarkupLine($"[green]Категория '{Markup.Escape(categoryName)}' успешно добавлена![/]");
             }
             catch (Exception ex)
             {
-                AnsiConsole.MarkupLine($"[red]Ошибка добавления категории: {ex.Message}[/]");
+                AnsiConsole.MarkupLine($"[red]Ошибка добавления категории: {Markup.Escape(ex.Message)}[/]");
             }
         }
 
@@ -115,7 +115,7 @@ namespace HSEFinance.ConsoleApp
             }
             catch (Exception ex)
             {
-                AnsiConsole.MarkupLine($"[red]Ошибка отображения категорий: {ex.Message}[/]");
+                AnsiConsole.MarkupLine($"[red]Ошибка отображения категорий: {Markup.Escape(ex.Message)}[/]");
             }
         }
 
@@ -141,11 +141,11 @@ namespace HSEFinance.ConsoleApp
                 // Удаление категории из репозитория
                 _categoryRepository.DeleteCategory(categoryToDelete.Id);
 
-                AnsiConsole.MarkupLine($"[green]Категория '{categoryToDelete.Name}' успешно удалена![/]");
+                AnsiConsole.MarkupLine($"[green]Категория '{Markup.Escape(categoryToDelete.Name)}' успешно удалена![/]");
             }
             catch (Exception ex)
             {
-                AnsiConsole.MarkupLine($"[red]Ошибка удаления категории: {ex.Message}[/]");
+                AnsiConsole.MarkupLine($"[red]Ошибка удаления категории: {Markup.Escape(ex.Message)}[/]");
             }
         }
         
@@ -166,7 +166,7 @@ namespace HSEFinance.ConsoleApp
                         .Title("Выберите категорию для редактирования:")
                         .AddChoices(categories));
 
-                var newName = AnsiConsole.Ask<string>($"Введите новое название категории (текущее: {categoryToEdit.Name}):");
+                var newName = AnsiConsole.Ask<string>($"Введите новое название категории (текущее: {Markup.Escape(categoryToEdit.Name)}):");
                 var newType = AnsiConsole.Prompt(
                     new SelectionPrompt<ItemType>()
                         .Title($"Выберите новый тип категории (текущий: {categoryToEdit.Type}):")
@@ -177,11 +177,11 @@ namespace HSEFinance.ConsoleApp
 
                 _categoryRepository.UpdateCategory(categoryToEdit);
 
-                AnsiConsole.MarkupLine($"[green]Категория '{categoryToEdit.Name}' успешно обновлена![/]");
+                AnsiConsole.MarkupLine($"[green]Категория '{Markup.Escape(categoryToEdit.Name)}' успешно обновлена![/]");
             }
             catch (Exception ex)
             {
-                AnsiConsole.MarkupLine($"[red]Ошибка редактирования категории: {ex.Message}[/]");
+                AnsiConsole.MarkupLine($"[red]Ошибка редактирования категории: {Markup.Escape(ex.Message)}[/]");
             }
         }
         
@@ -204,7 +204,7 @@ namespace HSEFinance.ConsoleApp
         
                 if (categories == null)
                 {
-                    AnsiConsole.MarkupLine("[red]Импорт не выполнен: файл не содержит данные или имеет неправильный формат.[/]");
+                    AnsiConsole.MarkupLine(Markup.Escape("[red]Импорт не выполнен: файл не содержит данные или имеет неправильный формат.[/]"));
                     return;
                 }
                 
@@ -216,15 +216,15 @@ namespace HSEFinance.ConsoleApp
                     }
                     catch (Exception ex)
                     {
-                        AnsiConsole.MarkupLine($"[red]Ошибка добавления категории '{category.Name}': {ex.Message}[/]");
+                        AnsiConsole.MarkupLine($"[red]Ошибка добавления категории '{Markup.Escape(category.Name)}': {Markup.Escape(ex.Message)}[/]");
                     }
                 }
         
-                AnsiConsole.MarkupLine("[green]Категории успешно импортированы![/]");
+                AnsiConsole.MarkupLine(Markup.Escape("[green]Категории успешно импортированы![/]"));
             }
             catch (Exception ex)
             {
-                AnsiConsole.MarkupLine($"[red]Ошибка импорта категорий: {ex.Message}[/]");
+                AnsiConsole.MarkupLine($"[red]Ошибка импорта категорий: {Markup.Escape(ex.Message)}[/]");
             }
         }
         
@@ -237,11 +237,11 @@ namespace HSEFinance.ConsoleApp
         
                 _categoryImportExportFacade.Export(_categoryRepository.GetAllCategories(), format, filePath);
         
-                AnsiConsole.MarkupLine("[green]Данные категорий успешно экспортированы![/]");
+                AnsiConsole.MarkupLine(Markup.Escape("[green]Данные категорий успешно экспортированы![/]"));
             }
             catch (Exception ex)
             {
-                AnsiConsole.MarkupLine($"[red]Ошибка экспорта категорий: {ex.Message}[/]");
+                AnsiConsole.MarkupLine($"[red]Ошибка экспорта категорий: {Markup.Escape(ex.Message)}[/]");
             }
         }
     }

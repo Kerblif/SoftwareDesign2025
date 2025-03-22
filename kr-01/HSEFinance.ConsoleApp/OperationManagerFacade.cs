@@ -92,7 +92,7 @@ namespace HSEFinance.ConsoleApp
             }
             catch (Exception ex)
             {
-                AnsiConsole.MarkupLine($"[red]Ошибка добавления операции: {ex.Message}[/]");
+                AnsiConsole.MarkupLine($"[red]Ошибка добавления операции: {Markup.Escape(ex.Message)}[/]");
             }
         }
 
@@ -136,7 +136,7 @@ namespace HSEFinance.ConsoleApp
             }
             catch (Exception ex)
             {
-                AnsiConsole.MarkupLine($"[red]Ошибка отображения операций: {ex.Message}[/]");
+                AnsiConsole.MarkupLine($"[red]Ошибка отображения операций: {Markup.Escape(ex.Message)}[/]");
             }
         }
 
@@ -167,7 +167,7 @@ namespace HSEFinance.ConsoleApp
             }
             catch (Exception ex)
             {
-                AnsiConsole.MarkupLine($"[red]Ошибка удаления операции: {ex.Message}[/]");
+                AnsiConsole.MarkupLine($"[red]Ошибка удаления операции: {Markup.Escape(ex.Message)}[/]");
             }
         }
         
@@ -197,7 +197,7 @@ namespace HSEFinance.ConsoleApp
             }
             catch (Exception ex)
             {
-                AnsiConsole.MarkupLine($"[red]Ошибка редактирования операции: {ex.Message}[/]");
+                AnsiConsole.MarkupLine($"[red]Ошибка редактирования операции: {Markup.Escape(ex.Message)}[/]");
             }
         }
         
@@ -240,7 +240,7 @@ namespace HSEFinance.ConsoleApp
             }
             catch (Exception ex)
             {
-                AnsiConsole.MarkupLine($"[red]Ошибка импорта: {ex.Message}[/]");
+                AnsiConsole.MarkupLine($"[red]Ошибка импорта: {Markup.Escape(ex.Message)}[/]");
             }
         }
         
@@ -257,7 +257,7 @@ namespace HSEFinance.ConsoleApp
             }
             catch (Exception ex)
             {
-                AnsiConsole.MarkupLine($"[red]Ошибка экспорта: {ex.Message}[/]");
+                AnsiConsole.MarkupLine($"[red]Ошибка экспорта: {Markup.Escape(ex.Message)}[/]");
             }
         }
     }

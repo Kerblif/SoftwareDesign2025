@@ -15,6 +15,11 @@ namespace HSEFinance.Lib.Domain.Factories
             Guid categoryId, 
             string? description = null)
         {
+            if (amount < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(amount), "Amount cannot be less than 0.");
+            }
+            
             return new Operation(type, bankAccountId, amount, date, categoryId, description);
         }
     }

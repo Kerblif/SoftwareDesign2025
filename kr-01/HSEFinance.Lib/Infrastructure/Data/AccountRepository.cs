@@ -10,10 +10,12 @@ namespace HSEFinance.Lib.Infrastructure.Data
     public class AccountRepository : IAccountRepository
     {
         private readonly HSEFinanceDbContext _dbContext;
+        private readonly IBankAccountFactory _bankAccountFactory;
 
-        public AccountRepository(HSEFinanceDbContext dbContext)
+        public AccountRepository(HSEFinanceDbContext dbContext, IBankAccountFactory bankAccountFactory)
         {
             _dbContext = dbContext;
+            _bankAccountFactory = bankAccountFactory;
         }
 
         public IEnumerable<BankAccount> GetAllBankAccounts()
@@ -23,7 +25,7 @@ namespace HSEFinance.Lib.Infrastructure.Data
 
         public BankAccount CreateBankAccount(string? name)
         {
-            var account = new BankAccount(name);
+            var account = _bankAccountFactory.Create(name);
             _dbContext.BankAccounts.Add(account);
             _dbContext.SaveChanges();
             return account;

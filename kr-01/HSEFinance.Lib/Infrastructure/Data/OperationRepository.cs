@@ -1,5 +1,3 @@
-// Файл: HSEFinance.Lib/Infrastructure/Data/OperationRepository.cs
-
 using HSEFinance.Lib.Domain.Entities;
 using HSEFinance.Lib.Domain.Enums;
 using HSEFinance.Lib.Domain.Repositories;
@@ -14,12 +12,14 @@ namespace HSEFinance.Lib.Infrastructure.Data
     public class OperationRepository : IOperationRepository
     {
         private readonly HSEFinanceDbContext _dbContext;
+        private readonly IOperationFactory _operationFactory;
         private readonly IAccountRepository _accountRepository;
         private readonly ICategoryRepository _categoryRepository;
         
-        public OperationRepository(HSEFinanceDbContext dbContext, IAccountRepository accountRepository, ICategoryRepository categoryRepository)
+        public OperationRepository(HSEFinanceDbContext dbContext, IOperationFactory operationFactory, IAccountRepository accountRepository, ICategoryRepository categoryRepository)
         {
             _dbContext = dbContext;
+            _operationFactory = operationFactory;
             _accountRepository = accountRepository;
             _categoryRepository = categoryRepository;
         }
@@ -53,7 +53,7 @@ namespace HSEFinance.Lib.Infrastructure.Data
                     throw new Exception("Category not found");
                 }
 
-                var operation = new Operation(type, bankAccountId, amount, date, categoryId, description);
+                var operation = _operationFactory.Create(type, bankAccountId, amount, date, categoryId, description);
                 _dbContext.Operations.Add(operation);
                 _dbContext.SaveChanges();
                 

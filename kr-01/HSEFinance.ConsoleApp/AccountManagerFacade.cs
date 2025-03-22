@@ -74,11 +74,11 @@ namespace HSEFinance.ConsoleApp
                 // Сохранение счета в репозитории
                 _accountRepository.CreateBankAccount(name);
 
-                AnsiConsole.MarkupLine($"[green]Счет '{name}' успешно добавлен![/]");
+                AnsiConsole.MarkupLine($"[green]Счет '{Markup.Escape(name)}' успешно добавлен![/]");
             }
             catch (Exception ex)
             {
-                AnsiConsole.MarkupLine($"[red]Ошибка добавления счета: {ex.Message}[/]");
+                AnsiConsole.MarkupLine($"[red]Ошибка добавления счета: {Markup.Escape(ex.Message)}[/]");
             }
         }
 
@@ -112,7 +112,7 @@ namespace HSEFinance.ConsoleApp
             }
             catch (Exception ex)
             {
-                AnsiConsole.MarkupLine($"[red]Ошибка отображения счетов: {ex.Message}[/]");
+                AnsiConsole.MarkupLine($"[red]Ошибка отображения счетов: {Markup.Escape(ex.Message)}[/]");
             }
         }
 
@@ -135,7 +135,7 @@ namespace HSEFinance.ConsoleApp
 
                 _accountRepository.DeleteBankAccount(accountToDelete.Id);
 
-                AnsiConsole.MarkupLine($"[green]Счет '{accountToDelete.Name}' успешно удален![/]");
+                AnsiConsole.MarkupLine($"[green]Счет '{Markup.Escape(accountToDelete.Name)}' успешно удален![/]");
             }
             catch (Exception ex)
             {
@@ -172,7 +172,7 @@ namespace HSEFinance.ConsoleApp
         
                 _accountRepository.UpdateBankAccount(accountToEdit);
         
-                AnsiConsole.MarkupLine($"[green]Счет '{accountToEdit.Name}' успешно обновлен![/]");
+                AnsiConsole.MarkupLine($"[green]Счет '{Markup.Escape(accountToEdit.Name)}' успешно обновлен![/]");
             }
             catch (Exception ex)
             {
@@ -218,7 +218,7 @@ namespace HSEFinance.ConsoleApp
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Ошибка импорта: {ex.Message}");
+                AnsiConsole.MarkupLine($"[red]Ошибка импорта: {Markup.Escape(ex.Message)}[/]");
             }
         }
 
@@ -239,11 +239,11 @@ namespace HSEFinance.ConsoleApp
         
                 _accountImportExportFacade.Export(accounts, format, filePath);
         
-                AnsiConsole.MarkupLine($"[green]Счета успешно экспортированы в файл '{filePath}' в формате {format}.[/]");
+                AnsiConsole.MarkupLine($"[green]Счета успешно экспортированы в файл '{Markup.Escape(filePath)}' в формате {Markup.Escape(format)}.[/]");
             }
             catch (Exception ex)
             {
-                AnsiConsole.MarkupLine($"[red]Ошибка экспорта: {ex.Message}[/]");
+                AnsiConsole.MarkupLine($"[red]Ошибка экспорта: {Markup.Escape(ex.Message)}[/]");
             }
         }
         private void RecalculateAccount()
@@ -265,11 +265,13 @@ namespace HSEFinance.ConsoleApp
 
                 _accountRepository.RecalculateAccountBalance(accountToRecalculate.Id);
 
-                AnsiConsole.MarkupLine($"[green]Счет '{accountToRecalculate.Name}' успешно пересчитан![/]");
+                if (accountToRecalculate.Name != null)
+                    AnsiConsole.MarkupLine("[green]Счет {0} успешно пересчитан![/]",
+                        Markup.Escape(accountToRecalculate.Name));
             }
             catch (Exception ex)
             {
-                AnsiConsole.MarkupLine($"[red]Ошибка пересчета счета: {ex.Message}[/]");
+                AnsiConsole.MarkupLine("[red]Ошибка пересчета счета: {0}[/]", Markup.Escape(ex.Message));
             }
         }
     }
