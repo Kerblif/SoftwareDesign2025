@@ -1,4 +1,5 @@
 using HSEFinance.Lib.Core;
+using HSEFinance.Lib.Core.Interfaces;
 using HSEFinance.Lib.Domain.Entities;
 using HSEFinance.Lib.Domain.Enums;
 using HSEFinance.Lib.Domain.Repositories;
@@ -66,7 +67,18 @@ namespace HSEFinance.Lib.Infrastructure.Data.Proxies
             _repository.UpdateOperation(operation);
             _cache[operation.Id] = operation;
         }
+
+        public void UploadOperation(Operation operation)
+        {
+            if (_cache.ContainsKey(operation.Id))
+            {
+                throw new InvalidOperationException($"An operation with ID {operation.Id} already exists.");
+            }
         
+            _repository.UploadOperation(operation);
+            _cache[operation.Id] = operation;
+        }
+
         public void Accept(IVisitor visitor)
         {
             foreach (var account in GetAllOperations())

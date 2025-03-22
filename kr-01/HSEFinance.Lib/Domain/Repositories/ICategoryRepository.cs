@@ -10,5 +10,6 @@ namespace HSEFinance.Lib.Domain.Repositories
         Category? GetCategory(Guid categoryId);
         bool DeleteCategory(Guid categoryId);
         void UpdateCategory(Category account);
+        void UploadCategory(Category account);
     }
 }

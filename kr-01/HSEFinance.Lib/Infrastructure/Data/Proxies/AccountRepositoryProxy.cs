@@ -5,7 +5,7 @@ using HSEFinance.Lib.Domain.Repositories;
 
 namespace HSEFinance.Lib.Infrastructure.Data.Proxies
 {
-    public class AccountRepositoryProxy : IAccountRepository, IVisitable
+    public class AccountRepositoryProxy : IAccountRepository
     {
         private readonly IAccountRepository _repository;
         private readonly Dictionary<Guid, BankAccount> _cache = new();
@@ -21,7 +21,7 @@ namespace HSEFinance.Lib.Infrastructure.Data.Proxies
             }
         }
 
-        public BankAccount CreateBankAccount(string name)
+        public BankAccount CreateBankAccount(string? name)
         {
             var account = _repository.CreateBankAccount(name);
 
@@ -67,7 +67,32 @@ namespace HSEFinance.Lib.Infrastructure.Data.Proxies
 
             _cache[account.Id] = account;
         }
+
+        public void UploadBankAccount(BankAccount account)
+        {
+            if (_cache.ContainsKey(account.Id))
+            {
+                throw new InvalidOperationException($"A bank account with ID {account.Id} already exists in the cache.");
+            }
         
+            _repository.UploadBankAccount(account);
+            _cache[account.Id] = account;
+        }
+
+        public void RecalculateAccountBalance(Guid accountId)
+        {
+            _repository.RecalculateAccountBalance(accountId);
+            
+            var account = _repository.GetBankAccount(accountId);
+
+            if (account == null)
+            {
+                throw new InvalidOperationException($"Bank account with ID {accountId} was not found.");
+            }
+            
+            _cache[accountId] = account;
+        }
+
         public void Accept(IVisitor visitor)
         {
             foreach (var account in GetAllBankAccounts())

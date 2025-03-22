@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using HSEFinance.Lib.Application.Facades;
 using Microsoft.Extensions.DependencyInjection;
 using Spectre.Console;
 using HSEFinance.Lib.Core;

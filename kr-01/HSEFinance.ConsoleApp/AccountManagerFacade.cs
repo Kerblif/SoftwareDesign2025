@@ -1,3 +1,4 @@
+using HSEFinance.Lib.Application.Facades;
 using Spectre.Console;
 using HSEFinance.Lib.Core;
 using HSEFinance.Lib.Domain.Entities;
@@ -8,10 +9,12 @@ namespace HSEFinance.ConsoleApp
 {
     public class AccountManagerFacade
     {
+        private readonly ImportExportFacade<BankAccount> _accountImportExportFacade;
         private readonly IAccountRepository _accountRepository;
 
         public AccountManagerFacade(IAccountRepository accountRepository)
         {
+            _accountImportExportFacade = new ImportExportFacade<BankAccount>();
             _accountRepository = new AccountRepositoryProxy(accountRepository);
         }
 
@@ -23,7 +26,7 @@ namespace HSEFinance.ConsoleApp
                 var choice = AnsiConsole.Prompt(
                     new SelectionPrompt<string>()
                         .Title("[green]Управление счетами[/]")
-                        .AddChoices("Добавить счет", "Показать все счета", "Удалить счет", "Редактировать счет", "Назад"));
+                        .AddChoices("Добавить счет", "Показать все счета", "Удалить счет", "Редактировать счет", "Пересчет", "Импорт", "Экспорт", "Назад"));
 
                 switch (choice)
                 {
@@ -42,7 +45,19 @@ namespace HSEFinance.ConsoleApp
                     case "Редактировать счет":
                         EditAccount();
                         break;
+                    
+                    case "Импорт":
+                        Import();
+                        break;
 
+                    case "Экспорт":
+                        Export();
+                        break;
+
+                    case "Пересчет":
+                        RecalculateAccount();
+                        break;
+                    
                     case "Назад":
                         return; // Возврат в предыдущее меню
                 }
@@ -133,29 +148,128 @@ namespace HSEFinance.ConsoleApp
             try
             {
                 var accounts = _accountRepository.GetAllBankAccounts().ToList();
-
+        
                 if (accounts.Count == 0)
                 {
                     AnsiConsole.MarkupLine("[yellow]Нет счетов для редактирования.[/]");
                     return;
                 }
-
+        
                 var accountToEdit = AnsiConsole.Prompt(
                     new SelectionPrompt<BankAccount>()
                         .Title("Выберите счет для редактирования:")
                         .AddChoices(accounts));
-
+        
+                // Prompt for a new name
                 var newName = AnsiConsole.Ask<string>($"Введите новое название для счета (текущее: {accountToEdit.Name}):");
-                
                 accountToEdit.Name = newName;
-
+        
+                // Prompt for a new balance
+                var newBalance = AnsiConsole.Prompt(
+                    new TextPrompt<decimal>($"Введите новый баланс для счета (текущий: {accountToEdit.Balance:C}):"));
+        
+                accountToEdit.Balance = newBalance;
+        
                 _accountRepository.UpdateBankAccount(accountToEdit);
-
+        
                 AnsiConsole.MarkupLine($"[green]Счет '{accountToEdit.Name}' успешно обновлен![/]");
             }
             catch (Exception ex)
             {
                 AnsiConsole.MarkupLine($"[red]Ошибка редактирования счета: {ex.Message}[/]");
+            }
+        }
+        
+        private string PromptFormatSelection()
+        {
+            return AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                    .Title("Выберите формат файла ([green]json[/], [green]csv[/]):")
+                    .AddChoices(new[] { "json", "csv" }));
+        }
+
+        private void Import()
+        {
+            try
+            {
+                var filePath = AnsiConsole.Ask<string>("Введите путь к файлу для импорта:");
+        
+                var accounts = _accountImportExportFacade.Import(PromptFormatSelection(), filePath);
+
+                if (accounts == null)
+                {
+                    AnsiConsole.MarkupLine("[red]Файл не содержит никаких допустимых счетов.[/]");
+                    return;
+                }
+        
+                foreach (var account in accounts)
+                {
+                    try
+                    {
+                        _accountRepository.UploadBankAccount(account);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Ошибка добавления аккаунта '{account.Name}': {ex.Message}");
+                    }
+                }
+        
+                AnsiConsole.MarkupLine("[green]Банковские аккаунты успешно импортированы![/]");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка импорта: {ex.Message}");
+            }
+        }
+
+        private void Export()
+        {
+            try
+            {
+                var accounts = _accountRepository.GetAllBankAccounts().ToList();
+        
+                if (accounts.Count == 0)
+                {
+                    AnsiConsole.MarkupLine("[yellow]Нет счетов для экспорта.[/]");
+                    return;
+                }
+        
+                var filePath = AnsiConsole.Ask<string>("Введите путь для сохранения файла:");
+                var format = PromptFormatSelection();
+        
+                _accountImportExportFacade.Export(accounts, format, filePath);
+        
+                AnsiConsole.MarkupLine($"[green]Счета успешно экспортированы в файл '{filePath}' в формате {format}.[/]");
+            }
+            catch (Exception ex)
+            {
+                AnsiConsole.MarkupLine($"[red]Ошибка экспорта: {ex.Message}[/]");
+            }
+        }
+        private void RecalculateAccount()
+        {
+            try
+            {
+                var accounts = _accountRepository.GetAllBankAccounts().ToList();
+
+                if (accounts.Count == 0)
+                {
+                    AnsiConsole.MarkupLine("[yellow]Нет счетов для пересчета.[/]");
+                    return;
+                }
+
+                var accountToRecalculate = AnsiConsole.Prompt(
+                    new SelectionPrompt<BankAccount>()
+                        .Title("Выберите счет для пересчета баланса:")
+                        .AddChoices(accounts));
+
+                _accountRepository.RecalculateAccountBalance(accountToRecalculate.Id);
+
+                AnsiConsole.MarkupLine($"[green]Счет '{accountToRecalculate.Name}' успешно пересчитан![/]");
+            }
+            catch (Exception ex)
+            {
+                AnsiConsole.MarkupLine($"[red]Ошибка пересчета счета: {ex.Message}[/]");
             }
         }
     }

@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+using CsvHelper.Configuration.Attributes;
 using HSEFinance.Lib.Domain.Enums;
 using HSEFinance.Lib.Domain.Interfaces;
 using HSEFinance.Lib.Core;
@@ -8,10 +10,12 @@ namespace HSEFinance.Lib.Domain.Entities
     public class BankAccount : IIdentifiable, IVisitable
     {
         public Guid Id { get; }
-        public string Name { get; set; }
-        public decimal Balance { get; private set; }
-
-        public BankAccount(string name)
+        
+        public string? Name { get; set; }
+        
+        public decimal Balance { get; set; }
+        
+        public BankAccount(string? name)
         {
             Id = Guid.NewGuid();
             Name = name;
@@ -35,6 +39,6 @@ namespace HSEFinance.Lib.Domain.Entities
             visitor.Visit(this);
         }
         
-        public override string ToString() => Name;
+        public override string? ToString() => Name;
     }
 }

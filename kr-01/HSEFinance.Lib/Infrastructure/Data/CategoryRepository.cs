@@ -1,4 +1,5 @@
 using HSEFinance.Lib.Core;
+using HSEFinance.Lib.Core.Interfaces;
 using HSEFinance.Lib.Domain.Entities;
 using HSEFinance.Lib.Domain.Enums;
 using HSEFinance.Lib.Domain.Repositories;
@@ -49,7 +50,18 @@ namespace HSEFinance.Lib.Infrastructure.Data
             _dbContext.Categories.Update(category);
             _dbContext.SaveChanges();
         }
+
+        public void UploadCategory(Category account)
+        {
+            if (_dbContext.Categories.Find(account.Id) != null)
+            {
+                throw new InvalidOperationException($"A category with ID {account.Id} already exists.");
+            }
         
+            _dbContext.Categories.Add(account);
+            _dbContext.SaveChanges();
+        }
+
         public void Accept(IVisitor visitor)
         {
             foreach (var account in GetAllCategories())

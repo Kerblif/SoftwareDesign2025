@@ -5,7 +5,7 @@ namespace HSEFinance.Lib.Domain.Factories
 {
     public class BankAccountFactory : IBankAccountFactory
     {
-        public BankAccount Create(string name)
+        public BankAccount Create(string? name)
         {
             return new BankAccount(name);
         }

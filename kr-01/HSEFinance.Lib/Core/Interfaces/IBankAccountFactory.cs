@@ -4,6 +4,6 @@ namespace HSEFinance.Lib.Core
 {
     public interface IBankAccountFactory
     {
-        BankAccount Create(string name);
+        BankAccount Create(string? name);
     }
 }

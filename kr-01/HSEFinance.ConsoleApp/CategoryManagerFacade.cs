@@ -1,3 +1,4 @@
+using HSEFinance.Lib.Application.Facades;
 using Spectre.Console;
 using HSEFinance.Lib.Domain.Entities;
 using HSEFinance.Lib.Domain.Enums;
@@ -8,10 +9,12 @@ namespace HSEFinance.ConsoleApp
 {
     public class CategoryManagerFacade
     {
+        private readonly ImportExportFacade<Category> _categoryImportExportFacade;
         private readonly ICategoryRepository _categoryRepository;
 
         public CategoryManagerFacade(ICategoryRepository categoryRepository)
         {
+            _categoryImportExportFacade  = new ImportExportFacade<Category>();
             _categoryRepository = new CategoryRepositoryProxy(categoryRepository);
         }
 
@@ -22,7 +25,7 @@ namespace HSEFinance.ConsoleApp
                 var choice = AnsiConsole.Prompt(
                     new SelectionPrompt<string>()
                         .Title("[green]Управление категориями[/]")
-                        .AddChoices("Добавить категорию", "Показать все категории", "Удалить категорию", "Редактировать категорию", "Назад"));
+                        .AddChoices("Добавить категорию", "Показать все категории", "Удалить категорию", "Редактировать категорию", "Импорт", "Экспорт", "Назад"));
 
                 switch (choice)
                 {
@@ -40,6 +43,14 @@ namespace HSEFinance.ConsoleApp
                     
                     case "Редактировать категорию":
                         EditCategory();
+                        break;
+                    
+                    case "Импорт":
+                        Import();
+                        break;
+                    
+                    case "Экспорт":
+                        Export();
                         break;
 
                     case "Назад":
@@ -171,6 +182,66 @@ namespace HSEFinance.ConsoleApp
             catch (Exception ex)
             {
                 AnsiConsole.MarkupLine($"[red]Ошибка редактирования категории: {ex.Message}[/]");
+            }
+        }
+        
+        private string PromptFormatSelection()
+        {
+            return AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                    .Title("Выберите формат файла ([green]json[/], [green]csv[/]):")
+                    .AddChoices(new[] { "json", "csv" }));
+        }
+
+        private void Import()
+        {
+            try
+            {
+                var filePath = AnsiConsole.Ask<string>("Введите путь к файлу для импорта:");
+                var format = PromptFormatSelection();
+        
+                var categories = _categoryImportExportFacade.Import(format, filePath);
+        
+                if (categories == null)
+                {
+                    AnsiConsole.MarkupLine("[red]Импорт не выполнен: файл не содержит данные или имеет неправильный формат.[/]");
+                    return;
+                }
+                
+                foreach (var category in categories)
+                {
+                    try
+                    {
+                        _categoryRepository.CreateCategory(category.Type, category.Name);
+                    }
+                    catch (Exception ex)
+                    {
+                        AnsiConsole.MarkupLine($"[red]Ошибка добавления категории '{category.Name}': {ex.Message}[/]");
+                    }
+                }
+        
+                AnsiConsole.MarkupLine("[green]Категории успешно импортированы![/]");
+            }
+            catch (Exception ex)
+            {
+                AnsiConsole.MarkupLine($"[red]Ошибка импорта категорий: {ex.Message}[/]");
+            }
+        }
+        
+        private void Export()
+        {
+            try
+            {
+                var filePath = AnsiConsole.Ask<string>("Введите путь для сохранения файла экспорта:");
+                var format = PromptFormatSelection();
+        
+                _categoryImportExportFacade.Export(_categoryRepository.GetAllCategories(), format, filePath);
+        
+                AnsiConsole.MarkupLine("[green]Данные категорий успешно экспортированы![/]");
+            }
+            catch (Exception ex)
+            {
+                AnsiConsole.MarkupLine($"[red]Ошибка экспорта категорий: {ex.Message}[/]");
             }
         }
     }

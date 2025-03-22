@@ -2,9 +2,9 @@ using System.Text.Json;
 
 namespace HSEFinance.Lib.Application.Export
 {
-    public class JsonFileExporter<T> : FileExporterBase<T>
+    public class JsonFileExporter<T> : FileExporterBase<IEnumerable<T>>
     {
-        protected override string Serialize(T data)
+        protected override string Serialize(IEnumerable<T> data)
         {
             return JsonSerializer.Serialize(data, new JsonSerializerOptions
             {

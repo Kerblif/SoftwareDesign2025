@@ -10,6 +10,7 @@
       <Folder Include="Application\Analytics\" />
       <Folder Include="Application\Commands\" />
       <Folder Include="Application\Export\" />
+      <Folder Include="Application\Facades\" />
       <Folder Include="Application\Import\" />
       <Folder Include="Core\Interfaces\" />
       <Folder Include="Domain\Factories\" />
@@ -26,7 +27,6 @@
         <PrivateAssets>all</PrivateAssets>
       </PackageReference>
       <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0-preview.2.25163.2" />
-      <PackageReference Include="YamlDotNet" Version="16.3.0" />
     </ItemGroup>
 
 </Project>

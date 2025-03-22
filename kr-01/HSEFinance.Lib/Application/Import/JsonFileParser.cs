@@ -2,13 +2,13 @@ using System.Text.Json;
 
 namespace HSEFinance.Lib.Application.Import
 {
-    public class JsonFileImporter<T> : FileImporterBase<T>
+    public class JsonFileImporter<T> : FileImporterBase<IEnumerable<T>>
     {
-        protected override T Parse(string content)
+        protected override IEnumerable<T> Parse(string content)
         {
             try
             {
-                return JsonSerializer.Deserialize<T>(content)
+                return JsonSerializer.Deserialize<IEnumerable<T>>(content)
                        ?? throw new InvalidOperationException("Failed to deserialize JSON content.");
             }
             catch (JsonException ex)

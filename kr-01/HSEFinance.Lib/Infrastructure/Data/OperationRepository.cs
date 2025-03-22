@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HSEFinance.Lib.Core;
+using HSEFinance.Lib.Core.Interfaces;
 
 namespace HSEFinance.Lib.Infrastructure.Data
 {
@@ -138,7 +139,18 @@ namespace HSEFinance.Lib.Infrastructure.Data
             _dbContext.Operations.Update(existingOperation);
             _dbContext.SaveChanges();
         }
+
+        public void UploadOperation(Operation operation)
+        {
+            if (_dbContext.Operations.Find(operation.Id) != null)
+            {
+                throw new InvalidOperationException($"An operation with ID {operation.Id} already exists.");
+            }
         
+            _dbContext.Operations.Add(operation);
+            _dbContext.SaveChanges();
+        }
+
         public void Accept(IVisitor visitor)
         {
             foreach (var account in GetAllOperations())

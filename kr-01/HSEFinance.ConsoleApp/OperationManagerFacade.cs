@@ -1,4 +1,5 @@
 using HSEFinance.Lib.Application.Commands;
+using HSEFinance.Lib.Application.Facades;
 using Spectre.Console;
 using HSEFinance.Lib.Domain.Entities;
 using HSEFinance.Lib.Domain.Enums;
@@ -9,10 +10,12 @@ namespace HSEFinance.ConsoleApp
 {
     public class OperationManagerFacade
     {
+        private readonly ImportExportFacade<Operation> _operationImportExportFacade;
         private readonly IOperationRepository _operationRepository;
 
         public OperationManagerFacade(IOperationRepository operationRepository)
         {
+            _operationImportExportFacade = new ImportExportFacade<Operation>();
             _operationRepository = new OperationRepositoryProxy(operationRepository);
         }
 
@@ -29,6 +32,8 @@ namespace HSEFinance.ConsoleApp
                             "Показать все операции",
                             "Удалить операцию",
                             "Редактировать операцию",
+                            "Импорт",
+                            "Экспорт",
                             "Назад"));
 
                 switch (choice)
@@ -48,7 +53,14 @@ namespace HSEFinance.ConsoleApp
                     case "Редактировать операцию":
                         EditOperation();
                         break;
-
+                    
+                    case "Импорт":
+                        Import();
+                        break;
+                    
+                    case "Экспорт":
+                        Export();
+                        break;
 
                     case "Назад":
                         return;
@@ -186,6 +198,66 @@ namespace HSEFinance.ConsoleApp
             catch (Exception ex)
             {
                 AnsiConsole.MarkupLine($"[red]Ошибка редактирования операции: {ex.Message}[/]");
+            }
+        }
+        
+        private string PromptFormatSelection()
+        {
+            return AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                    .Title("Выберите формат файла ([green]json[/], [green]csv[/]):")
+                    .AddChoices(new[] { "json", "csv" }));
+        }
+
+        private void Import()
+        {
+            try
+            {
+                var format = PromptFormatSelection();
+                var filePath = AnsiConsole.Ask<string>("Введите путь к файлу для импорта:");
+                
+                var operations = _operationImportExportFacade.Import(format, filePath);
+        
+                if (operations == null)
+                {
+                    AnsiConsole.MarkupLine("[yellow]Нет операций для импорта.[/]");
+                    return;
+                }
+        
+                foreach (var operation in operations)
+                {
+                    try
+                    {
+                        _operationRepository.UploadOperation(operation);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Ошибка добавления операции с ID {operation.Id}: {ex.Message}");
+                    }
+                }
+                
+                AnsiConsole.MarkupLine("[green]Операции успешно импортированы![/]");
+            }
+            catch (Exception ex)
+            {
+                AnsiConsole.MarkupLine($"[red]Ошибка импорта: {ex.Message}[/]");
+            }
+        }
+        
+        private void Export()
+        {
+            try
+            {
+                var format = PromptFormatSelection();
+                var filePath = AnsiConsole.Ask<string>("Введите путь для сохранения файла экспорта:");
+                var operations = _operationRepository.GetAllOperations();
+                
+                _operationImportExportFacade.Export(operations, format, filePath);
+                AnsiConsole.MarkupLine("[green]Операции успешно экспортированы![/]");
+            }
+            catch (Exception ex)
+            {
+                AnsiConsole.MarkupLine($"[red]Ошибка экспорта: {ex.Message}[/]");
             }
         }
     }

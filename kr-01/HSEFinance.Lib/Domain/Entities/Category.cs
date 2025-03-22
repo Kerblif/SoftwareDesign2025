@@ -17,7 +17,7 @@ namespace HSEFinance.Lib.Domain.Entities
             Type = type;
             Name = name;
         }
-        
+
         public void Accept(IVisitor visitor)
         {
             visitor.Visit(this);

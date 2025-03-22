@@ -1,5 +1,6 @@
 using HSEFinance.Lib.Application.Analytics;
 using HSEFinance.Lib.Domain.Repositories;
+using HSEFinance.Lib.Infrastructure.Data.Proxies;
 using Spectre.Console;
 
 namespace HSEFinance.ConsoleApp
@@ -10,7 +11,7 @@ namespace HSEFinance.ConsoleApp
 
         public AnalyticsFacade(IOperationRepository operationRepository)
         {
-            _operationRepository = operationRepository;
+            _operationRepository = new OperationRepositoryProxy(operationRepository);
         }
         
         public void ShowMenu()
@@ -51,10 +52,7 @@ namespace HSEFinance.ConsoleApp
 
             var visitor = new IncomeExpenseDifferenceVisitor(startDate, endDate);
 
-            foreach (var operation in _operationRepository.GetAllOperations())
-            {
-                operation.Accept(visitor);
-            }
+            _operationRepository.Accept(visitor);
 
             AnsiConsole.MarkupLine($"[blue]Доходы:[/] {visitor.TotalIncome}");
             AnsiConsole.MarkupLine($"[blue]Расходы:[/] {visitor.TotalExpense}");
@@ -65,10 +63,7 @@ namespace HSEFinance.ConsoleApp
         {
             var visitor = new CategoryGroupingVisitor();
 
-            foreach (var operation in _operationRepository.GetAllOperations())
-            {
-                operation.Accept(visitor);
-            }
+            _operationRepository.Accept(visitor);
 
             var table = new Table()
                 .AddColumn("[green]Категория[/]")
@@ -91,10 +86,7 @@ namespace HSEFinance.ConsoleApp
         {
             var visitor = new AverageOperationVisitor();
 
-            foreach (var operation in _operationRepository.GetAllOperations())
-            {
-                operation.Accept(visitor);
-            }
+            _operationRepository.Accept(visitor);
 
             AnsiConsole.MarkupLine($"[blue]Средний доход:[/] {visitor.GetAverageIncome():F2}");
             AnsiConsole.MarkupLine($"[red]Средний расход:[/] {visitor.GetAverageExpense():F2}");
