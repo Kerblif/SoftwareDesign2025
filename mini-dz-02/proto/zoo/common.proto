@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package zoo;
+
+option go_package = "mini-dz-02/proto/zoo";
+
+import "google/protobuf/timestamp.proto";
+
+// Gender represents the gender of an animal
+enum Gender {
+  GENDER_UNSPECIFIED = 0;
+  GENDER_MALE = 1;
+  GENDER_FEMALE = 2;
+}
+
+// HealthStatus represents the health status of an animal
+enum HealthStatus {
+  HEALTH_STATUS_UNSPECIFIED = 0;
+  HEALTH_STATUS_HEALTHY = 1;
+  HEALTH_STATUS_SICK = 2;
+}
+
+// EnclosureType represents the type of enclosure
+enum EnclosureType {
+  ENCLOSURE_TYPE_UNSPECIFIED = 0;
+  ENCLOSURE_TYPE_PREDATOR = 1;
+  ENCLOSURE_TYPE_HERBIVORE = 2;
+  ENCLOSURE_TYPE_AVIARY = 3;
+  ENCLOSURE_TYPE_AQUARIUM = 4;
+  ENCLOSURE_TYPE_TERRARIUM = 5;
+}
+
+// FoodType represents the type of food
+enum FoodType {
+  FOOD_TYPE_UNSPECIFIED = 0;
+  FOOD_TYPE_MEAT = 1;
+  FOOD_TYPE_VEGETABLES = 2;
+  FOOD_TYPE_FRUITS = 3;
+  FOOD_TYPE_INSECTS = 4;
+  FOOD_TYPE_SEEDS = 5;
+}
+
+// Empty message for requests or responses that don't need any data
+message Empty {}

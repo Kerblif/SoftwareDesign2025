@@ -1,0 +1,106 @@
+syntax = "proto3";
+
+package zoo;
+
+option go_package = "mini-dz-02/proto/zoo";
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "zoo/common.proto";
+
+// Animal message represents an animal in the zoo
+message Animal {
+  string id = 1;
+  string species = 2;
+  string name = 3;
+  google.protobuf.Timestamp birth_date = 4;
+  Gender gender = 5;
+  FoodType favorite_food = 6;
+  HealthStatus health_status = 7;
+  string enclosure_id = 8;
+}
+
+// CreateAnimalRequest is the request for creating a new animal
+message CreateAnimalRequest {
+  string id = 1;
+  string species = 2;
+  string name = 3;
+  google.protobuf.Timestamp birth_date = 4;
+  Gender gender = 5;
+  FoodType favorite_food = 6;
+  HealthStatus health_status = 7;
+}
+
+// GetAnimalRequest is the request for getting an animal by ID
+message GetAnimalRequest {
+  string id = 1;
+}
+
+// GetAnimalsResponse is the response for getting all animals
+message GetAnimalsResponse {
+  repeated Animal animals = 1;
+}
+
+// DeleteAnimalRequest is the request for deleting an animal
+message DeleteAnimalRequest {
+  string id = 1;
+}
+
+// TransferAnimalRequest is the request for transferring an animal to another enclosure
+message TransferAnimalRequest {
+  string id = 1;
+  string enclosure_id = 2;
+}
+
+// TreatAnimalRequest is the request for treating a sick animal
+message TreatAnimalRequest {
+  string id = 1;
+}
+
+// AnimalService provides operations for managing animals
+service AnimalService {
+  // GetAnimal gets an animal by ID
+  rpc GetAnimal(GetAnimalRequest) returns (Animal) {
+    option (google.api.http) = {
+      get: "/api/animals/{id}"
+    };
+  }
+
+  // GetAnimals gets all animals
+  rpc GetAnimals(Empty) returns (GetAnimalsResponse) {
+    option (google.api.http) = {
+      get: "/api/animals"
+    };
+  }
+
+  // CreateAnimal creates a new animal
+  rpc CreateAnimal(CreateAnimalRequest) returns (Animal) {
+    option (google.api.http) = {
+      post: "/api/animals"
+      body: "*"
+    };
+  }
+
+  // DeleteAnimal deletes an animal
+  rpc DeleteAnimal(DeleteAnimalRequest) returns (Empty) {
+    option (google.api.http) = {
+      delete: "/api/animals/{id}"
+    };
+  }
+
+  // TransferAnimal transfers an animal to another enclosure
+  rpc TransferAnimal(TransferAnimalRequest) returns (Empty) {
+    option (google.api.http) = {
+      post: "/api/animals/{id}/transfer"
+      body: "*"
+    };
+  }
+
+  // TreatAnimal treats a sick animal
+  rpc TreatAnimal(TreatAnimalRequest) returns (Empty) {
+    option (google.api.http) = {
+      post: "/api/animals/{id}/treat"
+      body: "*"
+    };
+  }
+}

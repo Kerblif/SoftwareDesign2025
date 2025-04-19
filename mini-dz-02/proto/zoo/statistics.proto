@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+package zoo;
+
+option go_package = "mini-dz-02/proto/zoo";
+
+import "google/api/annotations.proto";
+import "zoo/common.proto";
+
+// ZooStatistics message represents statistics about the zoo
+message ZooStatistics {
+  int32 total_animals = 1;
+  int32 healthy_animals = 2;
+  int32 sick_animals = 3;
+  int32 total_enclosures = 4;
+  int32 available_enclosures = 5;
+  int32 full_enclosures = 6;
+  int32 empty_enclosures = 7;
+  map<string, int32> animals_by_species = 8;
+  map<string, int32> animals_by_gender = 9;
+  map<string, int32> animals_by_enclosure = 10;
+}
+
+// AnimalCountBySpeciesResponse is the response for getting the number of animals of each species
+message AnimalCountBySpeciesResponse {
+  map<string, int32> count_by_species = 1;
+}
+
+// EnclosureUtilizationResponse is the response for getting the utilization of each enclosure
+message EnclosureUtilizationResponse {
+  map<string, double> utilization = 1;
+}
+
+// HealthStatusStatisticsResponse is the response for getting statistics about animal health
+message HealthStatusStatisticsResponse {
+  map<string, int32> count_by_status = 1;
+}
+
+// StatisticsService provides operations for getting statistics about the zoo
+service StatisticsService {
+  // GetZooStatistics gets overall zoo statistics
+  rpc GetZooStatistics(Empty) returns (ZooStatistics) {
+    option (google.api.http) = {
+      get: "/api/statistics"
+    };
+  }
+
+  // GetAnimalCountBySpecies gets the number of animals of each species
+  rpc GetAnimalCountBySpecies(Empty) returns (AnimalCountBySpeciesResponse) {
+    option (google.api.http) = {
+      get: "/api/statistics/species"
+    };
+  }
+
+  // GetEnclosureUtilization gets the utilization of each enclosure
+  rpc GetEnclosureUtilization(Empty) returns (EnclosureUtilizationResponse) {
+    option (google.api.http) = {
+      get: "/api/statistics/enclosure-utilization"
+    };
+  }
+
+  // GetHealthStatusStatistics gets statistics about animal health
+  rpc GetHealthStatusStatistics(Empty) returns (HealthStatusStatisticsResponse) {
+    option (google.api.http) = {
+      get: "/api/statistics/health"
+    };
+  }
+}

@@ -1,0 +1,48 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+zoo-management
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool
+*.out
+coverage.html
+
+# Generated proto files
+internal/proto/
+
+# Google's proto
+proto/google
+proto/grafeas
+
+# Dependency directories (remove the comment below if you want to ignore vendor)
+# vendor/
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Log files
+*.log
+
+# Environment variables
+.env
+
+# Build artifacts
+bin/
+dist/
+
+# Temporary files
+tmp/
+temp/
+
+# Go workspace file
+go.work

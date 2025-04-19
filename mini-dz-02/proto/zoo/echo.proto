@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package zoo;
+
+option go_package = "mini-dz-02/proto/zoo";
+
+import "google/api/annotations.proto";
+
+// EchoRequest is the request for the Echo method
+message EchoRequest {
+  string message = 1;
+}
+
+// EchoResponse is the response from the Echo method
+message EchoResponse {
+  string message = 1;
+}
+
+// EchoService provides a simple echo service for debugging
+service EchoService {
+  // Echo echoes back the request message
+  rpc Echo(EchoRequest) returns (EchoResponse) {
+    option (google.api.http) = {
+      post: "/api/echo"
+      body: "*"
+    };
+  }
+}

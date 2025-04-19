@@ -1,0 +1,104 @@
+syntax = "proto3";
+
+package zoo;
+
+option go_package = "mini-dz-02/proto/zoo";
+
+import "google/api/annotations.proto";
+import "zoo/common.proto";
+import "zoo/animal.proto";
+
+// Enclosure message represents an animal enclosure in the zoo
+message Enclosure {
+  string id = 1;
+  EnclosureType type = 2;
+  int32 size = 3;
+  int32 max_capacity = 4;
+  repeated string current_animal_ids = 5;
+  bool is_clean = 6;
+}
+
+// CreateEnclosureRequest is the request for creating a new enclosure
+message CreateEnclosureRequest {
+  string id = 1;
+  EnclosureType type = 2;
+  int32 size = 3;
+  int32 max_capacity = 4;
+}
+
+// GetEnclosureRequest is the request for getting an enclosure by ID
+message GetEnclosureRequest {
+  string id = 1;
+}
+
+// GetEnclosuresResponse is the response for getting all enclosures
+message GetEnclosuresResponse {
+  repeated Enclosure enclosures = 1;
+}
+
+// DeleteEnclosureRequest is the request for deleting an enclosure
+message DeleteEnclosureRequest {
+  string id = 1;
+}
+
+// CleanEnclosureRequest is the request for cleaning an enclosure
+message CleanEnclosureRequest {
+  string id = 1;
+}
+
+// GetAnimalsInEnclosureRequest is the request for getting animals in an enclosure
+message GetAnimalsInEnclosureRequest {
+  string id = 1;
+}
+
+// GetAnimalsInEnclosureResponse is the response for getting animals in an enclosure
+message GetAnimalsInEnclosureResponse {
+  repeated Animal animals = 1;
+}
+
+// EnclosureService provides operations for managing enclosures
+service EnclosureService {
+  // GetEnclosure gets an enclosure by ID
+  rpc GetEnclosure(GetEnclosureRequest) returns (Enclosure) {
+    option (google.api.http) = {
+      get: "/api/enclosures/{id}"
+    };
+  }
+
+  // GetEnclosures gets all enclosures
+  rpc GetEnclosures(Empty) returns (GetEnclosuresResponse) {
+    option (google.api.http) = {
+      get: "/api/enclosures"
+    };
+  }
+
+  // CreateEnclosure creates a new enclosure
+  rpc CreateEnclosure(CreateEnclosureRequest) returns (Enclosure) {
+    option (google.api.http) = {
+      post: "/api/enclosures"
+      body: "*"
+    };
+  }
+
+  // DeleteEnclosure deletes an enclosure
+  rpc DeleteEnclosure(DeleteEnclosureRequest) returns (Empty) {
+    option (google.api.http) = {
+      delete: "/api/enclosures/{id}"
+    };
+  }
+
+  // CleanEnclosure cleans an enclosure
+  rpc CleanEnclosure(CleanEnclosureRequest) returns (Empty) {
+    option (google.api.http) = {
+      post: "/api/enclosures/{id}/clean"
+      body: "*"
+    };
+  }
+
+  // GetAnimalsInEnclosure gets animals in an enclosure
+  rpc GetAnimalsInEnclosure(GetAnimalsInEnclosureRequest) returns (GetAnimalsInEnclosureResponse) {
+    option (google.api.http) = {
+      get: "/api/enclosures/{id}/animals"
+    };
+  }
+}
