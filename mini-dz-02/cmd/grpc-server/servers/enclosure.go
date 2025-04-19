@@ -2,32 +2,29 @@ package servers
 
 import (
 	"context"
-	"fmt"
 	"mini-dz-02/internal/proto/zoo"
+	"mini-dz-02/pkg/zoo/application"
 	"mini-dz-02/pkg/zoo/domain"
 )
 
 // EnclosureServer implements the EnclosureService
 type EnclosureServer struct {
 	zoo.UnimplementedEnclosureServiceServer
-	enclosureRepository domain.EnclosureRepository
-	animalRepository    domain.AnimalRepository
+	enclosureManagementService *application.EnclosureManagementService
 }
 
 // NewEnclosureServer creates a new EnclosureServer
 func NewEnclosureServer(
-	enclosureRepository domain.EnclosureRepository,
-	animalRepository domain.AnimalRepository,
+	enclosureManagementService *application.EnclosureManagementService,
 ) *EnclosureServer {
 	return &EnclosureServer{
-		enclosureRepository: enclosureRepository,
-		animalRepository:    animalRepository,
+		enclosureManagementService: enclosureManagementService,
 	}
 }
 
 // GetEnclosure implements the GetEnclosure method of the EnclosureService
 func (s *EnclosureServer) GetEnclosure(ctx context.Context, req *zoo.GetEnclosureRequest) (*zoo.Enclosure, error) {
-	enclosure, err := s.enclosureRepository.GetByID(req.Id)
+	enclosure, err := s.enclosureManagementService.GetEnclosureByID(req.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +34,7 @@ func (s *EnclosureServer) GetEnclosure(ctx context.Context, req *zoo.GetEnclosur
 
 // GetEnclosures implements the GetEnclosures method of the EnclosureService
 func (s *EnclosureServer) GetEnclosures(ctx context.Context, req *zoo.Empty) (*zoo.GetEnclosuresResponse, error) {
-	enclosures, err := s.enclosureRepository.GetAll()
+	enclosures, err := s.enclosureManagementService.GetAllEnclosures()
 	if err != nil {
 		return nil, err
 	}
@@ -65,8 +62,8 @@ func (s *EnclosureServer) CreateEnclosure(ctx context.Context, req *zoo.CreateEn
 		return nil, err
 	}
 
-	// Create the enclosure
-	enclosure, err := domain.NewEnclosure(
+	// Create the enclosure using the service
+	enclosure, err := s.enclosureManagementService.CreateEnclosure(
 		req.Id,
 		ConvertProtoEnclosureType(req.Type),
 		size,
@@ -76,29 +73,13 @@ func (s *EnclosureServer) CreateEnclosure(ctx context.Context, req *zoo.CreateEn
 		return nil, err
 	}
 
-	// Save the enclosure
-	if err := s.enclosureRepository.Save(enclosure); err != nil {
-		return nil, err
-	}
-
 	return ConvertEnclosure(enclosure), nil
 }
 
 // DeleteEnclosure implements the DeleteEnclosure method of the EnclosureService
 func (s *EnclosureServer) DeleteEnclosure(ctx context.Context, req *zoo.DeleteEnclosureRequest) (*zoo.Empty, error) {
-	// Check if the enclosure exists
-	enclosure, err := s.enclosureRepository.GetByID(req.Id)
-	if err != nil {
-		return nil, err
-	}
-
-	// Check if the enclosure is empty
-	if len(enclosure.CurrentAnimalIDs) > 0 {
-		return nil, fmt.Errorf("cannot delete enclosure with animals")
-	}
-
-	// Delete the enclosure
-	if err := s.enclosureRepository.Delete(req.Id); err != nil {
+	// Delete the enclosure using the service
+	if err := s.enclosureManagementService.DeleteEnclosure(req.Id); err != nil {
 		return nil, err
 	}
 
@@ -107,19 +88,8 @@ func (s *EnclosureServer) DeleteEnclosure(ctx context.Context, req *zoo.DeleteEn
 
 // CleanEnclosure implements the CleanEnclosure method of the EnclosureService
 func (s *EnclosureServer) CleanEnclosure(ctx context.Context, req *zoo.CleanEnclosureRequest) (*zoo.Empty, error) {
-	// Get the enclosure
-	enclosure, err := s.enclosureRepository.GetByID(req.Id)
-	if err != nil {
-		return nil, err
-	}
-
-	// Clean the enclosure
-	if err := enclosure.Clean(); err != nil {
-		return nil, err
-	}
-
-	// Save the enclosure
-	if err := s.enclosureRepository.Save(enclosure); err != nil {
+	// Clean the enclosure using the service
+	if err := s.enclosureManagementService.CleanEnclosure(req.Id); err != nil {
 		return nil, err
 	}
 
@@ -128,20 +98,15 @@ func (s *EnclosureServer) CleanEnclosure(ctx context.Context, req *zoo.CleanEncl
 
 // GetAnimalsInEnclosure implements the GetAnimalsInEnclosure method of the EnclosureService
 func (s *EnclosureServer) GetAnimalsInEnclosure(ctx context.Context, req *zoo.GetAnimalsInEnclosureRequest) (*zoo.GetAnimalsInEnclosureResponse, error) {
-	// Get the enclosure
-	enclosure, err := s.enclosureRepository.GetByID(req.Id)
+	// Get the animals in the enclosure using the service
+	animals, err := s.enclosureManagementService.GetAnimalsInEnclosure(req.Id)
 	if err != nil {
 		return nil, err
 	}
 
-	// Get the animals in the enclosure
+	// Convert to proto
 	var protoAnimals []*zoo.Animal
-	for _, animalID := range enclosure.CurrentAnimalIDs {
-		animal, err := s.animalRepository.GetByID(animalID)
-		if err != nil {
-			return nil, err
-		}
-
+	for _, animal := range animals {
 		protoAnimals = append(protoAnimals, ConvertAnimal(animal))
 	}
 

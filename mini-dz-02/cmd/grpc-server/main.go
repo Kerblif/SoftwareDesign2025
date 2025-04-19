@@ -43,6 +43,12 @@ func main() {
 		eventPublisher,
 	)
 
+	enclosureManagementService := application.NewEnclosureManagementService(
+		enclosureRepository,
+		animalRepository,
+		eventPublisher,
+	)
+
 	zooStatisticsService := application.NewZooStatisticsService(
 		animalRepository,
 		enclosureRepository,
@@ -53,8 +59,8 @@ func main() {
 
 	// Create server implementations
 	echoServer := servers.NewEchoServer()
-	animalServer := servers.NewAnimalServer(animalRepository, enclosureRepository, animalTransferService)
-	enclosureServer := servers.NewEnclosureServer(enclosureRepository, animalRepository)
+	animalServer := servers.NewAnimalServer(animalTransferService)
+	enclosureServer := servers.NewEnclosureServer(enclosureManagementService)
 	feedingScheduleServer := servers.NewFeedingScheduleServer(feedingScheduleRepository, animalRepository, feedingOrganizationService)
 	statisticsServer := servers.NewStatisticsServer(zooStatisticsService)
 

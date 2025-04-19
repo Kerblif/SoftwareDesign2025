@@ -103,3 +103,106 @@ func (s *AnimalTransferService) GetAvailableEnclosures() ([]*domain.Enclosure, e
 func (s *AnimalTransferService) GetAnimalsByEnclosure(enclosureID string) ([]*domain.Animal, error) {
 	return s.animalRepository.GetByEnclosureID(enclosureID)
 }
+
+// GetAnimalByID returns an animal by its ID
+func (s *AnimalTransferService) GetAnimalByID(animalID string) (*domain.Animal, error) {
+	animal, err := s.animalRepository.GetByID(animalID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get animal: %w", err)
+	}
+	return animal, nil
+}
+
+// GetAllAnimals returns all animals
+func (s *AnimalTransferService) GetAllAnimals() ([]*domain.Animal, error) {
+	animals, err := s.animalRepository.GetAll()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get all animals: %w", err)
+	}
+	return animals, nil
+}
+
+// CreateAnimal creates a new animal
+func (s *AnimalTransferService) CreateAnimal(
+	id string,
+	species domain.Species,
+	name domain.AnimalName,
+	birthDate domain.BirthDate,
+	gender domain.Gender,
+	favoriteFood domain.FoodType,
+	healthStatus domain.HealthStatus,
+) (*domain.Animal, error) {
+	// Create the animal
+	animal, err := domain.NewAnimal(
+		id,
+		species,
+		name,
+		birthDate,
+		gender,
+		favoriteFood,
+		healthStatus,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create animal: %w", err)
+	}
+
+	// Save the animal
+	if err := s.animalRepository.Save(animal); err != nil {
+		return nil, fmt.Errorf("failed to save animal: %w", err)
+	}
+
+	return animal, nil
+}
+
+// DeleteAnimal deletes an animal
+func (s *AnimalTransferService) DeleteAnimal(animalID string) error {
+	// Check if the animal exists
+	animal, err := s.animalRepository.GetByID(animalID)
+	if err != nil {
+		return fmt.Errorf("failed to get animal: %w", err)
+	}
+
+	// If the animal is in an enclosure, remove it first
+	if animal.IsInEnclosure() {
+		enclosure, err := s.enclosureRepository.GetByID(animal.EnclosureID)
+		if err != nil {
+			return fmt.Errorf("failed to get enclosure: %w", err)
+		}
+
+		if err := enclosure.RemoveAnimal(animal.ID); err != nil {
+			return fmt.Errorf("failed to remove animal from enclosure: %w", err)
+		}
+
+		if err := s.enclosureRepository.Save(enclosure); err != nil {
+			return fmt.Errorf("failed to save enclosure: %w", err)
+		}
+	}
+
+	// Delete the animal
+	if err := s.animalRepository.Delete(animalID); err != nil {
+		return fmt.Errorf("failed to delete animal: %w", err)
+	}
+
+	return nil
+}
+
+// TreatAnimal treats a sick animal
+func (s *AnimalTransferService) TreatAnimal(animalID string) error {
+	// Get the animal
+	animal, err := s.animalRepository.GetByID(animalID)
+	if err != nil {
+		return fmt.Errorf("failed to get animal: %w", err)
+	}
+
+	// Treat the animal
+	if err := animal.Treat(); err != nil {
+		return fmt.Errorf("failed to treat animal: %w", err)
+	}
+
+	// Save the animal
+	if err := s.animalRepository.Save(animal); err != nil {
+		return fmt.Errorf("failed to save animal: %w", err)
+	}
+
+	return nil
+}

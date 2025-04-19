@@ -160,3 +160,28 @@ func (s *FeedingOrganizationService) GetFeedingSchedulesByAnimal(animalID string
 func (s *FeedingOrganizationService) GetAllFeedingSchedules() ([]*domain.FeedingSchedule, error) {
 	return s.feedingScheduleRepository.GetAll()
 }
+
+// GetFeedingScheduleByID returns a feeding schedule by its ID
+func (s *FeedingOrganizationService) GetFeedingScheduleByID(scheduleID string) (*domain.FeedingSchedule, error) {
+	schedule, err := s.feedingScheduleRepository.GetByID(scheduleID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get feeding schedule: %w", err)
+	}
+	return schedule, nil
+}
+
+// DeleteFeedingSchedule deletes a feeding schedule
+func (s *FeedingOrganizationService) DeleteFeedingSchedule(scheduleID string) error {
+	// Check if the feeding schedule exists
+	_, err := s.feedingScheduleRepository.GetByID(scheduleID)
+	if err != nil {
+		return fmt.Errorf("failed to get feeding schedule: %w", err)
+	}
+
+	// Delete the feeding schedule
+	if err := s.feedingScheduleRepository.Delete(scheduleID); err != nil {
+		return fmt.Errorf("failed to delete feeding schedule: %w", err)
+	}
+
+	return nil
+}

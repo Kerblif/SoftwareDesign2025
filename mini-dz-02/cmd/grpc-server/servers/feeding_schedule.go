@@ -30,7 +30,7 @@ func NewFeedingScheduleServer(
 
 // GetFeedingSchedule implements the GetFeedingSchedule method of the FeedingScheduleService
 func (s *FeedingScheduleServer) GetFeedingSchedule(ctx context.Context, req *zoo.GetFeedingScheduleRequest) (*zoo.FeedingSchedule, error) {
-	schedule, err := s.feedingScheduleRepository.GetByID(req.Id)
+	schedule, err := s.feedingOrganizationService.GetFeedingScheduleByID(req.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +40,7 @@ func (s *FeedingScheduleServer) GetFeedingSchedule(ctx context.Context, req *zoo
 
 // GetFeedingSchedules implements the GetFeedingSchedules method of the FeedingScheduleService
 func (s *FeedingScheduleServer) GetFeedingSchedules(ctx context.Context, req *zoo.Empty) (*zoo.GetFeedingSchedulesResponse, error) {
-	schedules, err := s.feedingScheduleRepository.GetAll()
+	schedules, err := s.feedingOrganizationService.GetAllFeedingSchedules()
 	if err != nil {
 		return nil, err
 	}
@@ -90,14 +90,8 @@ func (s *FeedingScheduleServer) CreateFeedingSchedule(ctx context.Context, req *
 
 // DeleteFeedingSchedule implements the DeleteFeedingSchedule method of the FeedingScheduleService
 func (s *FeedingScheduleServer) DeleteFeedingSchedule(ctx context.Context, req *zoo.DeleteFeedingScheduleRequest) (*zoo.Empty, error) {
-	// Check if the feeding schedule exists
-	_, err := s.feedingScheduleRepository.GetByID(req.Id)
-	if err != nil {
-		return nil, err
-	}
-
-	// Delete the feeding schedule
-	if err := s.feedingScheduleRepository.Delete(req.Id); err != nil {
+	// Delete the feeding schedule using the service
+	if err := s.feedingOrganizationService.DeleteFeedingSchedule(req.Id); err != nil {
 		return nil, err
 	}
 

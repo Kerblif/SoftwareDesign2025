@@ -10,27 +10,21 @@ import (
 // AnimalServer implements the AnimalService
 type AnimalServer struct {
 	zoo.UnimplementedAnimalServiceServer
-	animalRepository    domain.AnimalRepository
-	enclosureRepository domain.EnclosureRepository
-	transferService     *application.AnimalTransferService
+	transferService *application.AnimalTransferService
 }
 
 // NewAnimalServer creates a new AnimalServer
 func NewAnimalServer(
-	animalRepository domain.AnimalRepository,
-	enclosureRepository domain.EnclosureRepository,
 	transferService *application.AnimalTransferService,
 ) *AnimalServer {
 	return &AnimalServer{
-		animalRepository:    animalRepository,
-		enclosureRepository: enclosureRepository,
-		transferService:     transferService,
+		transferService: transferService,
 	}
 }
 
 // GetAnimal implements the GetAnimal method of the AnimalService
 func (s *AnimalServer) GetAnimal(ctx context.Context, req *zoo.GetAnimalRequest) (*zoo.Animal, error) {
-	animal, err := s.animalRepository.GetByID(req.Id)
+	animal, err := s.transferService.GetAnimalByID(req.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +34,7 @@ func (s *AnimalServer) GetAnimal(ctx context.Context, req *zoo.GetAnimalRequest)
 
 // GetAnimals implements the GetAnimals method of the AnimalService
 func (s *AnimalServer) GetAnimals(ctx context.Context, req *zoo.Empty) (*zoo.GetAnimalsResponse, error) {
-	animals, err := s.animalRepository.GetAll()
+	animals, err := s.transferService.GetAllAnimals()
 	if err != nil {
 		return nil, err
 	}
@@ -73,8 +67,8 @@ func (s *AnimalServer) CreateAnimal(ctx context.Context, req *zoo.CreateAnimalRe
 		return nil, err
 	}
 
-	// Create the animal
-	animal, err := domain.NewAnimal(
+	// Create the animal using the transfer service
+	animal, err := s.transferService.CreateAnimal(
 		req.Id,
 		species,
 		name,
@@ -87,40 +81,13 @@ func (s *AnimalServer) CreateAnimal(ctx context.Context, req *zoo.CreateAnimalRe
 		return nil, err
 	}
 
-	// Save the animal
-	if err := s.animalRepository.Save(animal); err != nil {
-		return nil, err
-	}
-
 	return ConvertAnimal(animal), nil
 }
 
 // DeleteAnimal implements the DeleteAnimal method of the AnimalService
 func (s *AnimalServer) DeleteAnimal(ctx context.Context, req *zoo.DeleteAnimalRequest) (*zoo.Empty, error) {
-	// Check if the animal exists
-	animal, err := s.animalRepository.GetByID(req.Id)
-	if err != nil {
-		return nil, err
-	}
-
-	// If the animal is in an enclosure, remove it first
-	if animal.IsInEnclosure() {
-		enclosure, err := s.enclosureRepository.GetByID(animal.EnclosureID)
-		if err != nil {
-			return nil, err
-		}
-
-		if err := enclosure.RemoveAnimal(animal.ID); err != nil {
-			return nil, err
-		}
-
-		if err := s.enclosureRepository.Save(enclosure); err != nil {
-			return nil, err
-		}
-	}
-
-	// Delete the animal
-	if err := s.animalRepository.Delete(req.Id); err != nil {
+	// Delete the animal using the transfer service
+	if err := s.transferService.DeleteAnimal(req.Id); err != nil {
 		return nil, err
 	}
 
@@ -139,19 +106,8 @@ func (s *AnimalServer) TransferAnimal(ctx context.Context, req *zoo.TransferAnim
 
 // TreatAnimal implements the TreatAnimal method of the AnimalService
 func (s *AnimalServer) TreatAnimal(ctx context.Context, req *zoo.TreatAnimalRequest) (*zoo.Empty, error) {
-	// Get the animal
-	animal, err := s.animalRepository.GetByID(req.Id)
-	if err != nil {
-		return nil, err
-	}
-
-	// Treat the animal
-	if err := animal.Treat(); err != nil {
-		return nil, err
-	}
-
-	// Save the animal
-	if err := s.animalRepository.Save(animal); err != nil {
+	// Treat the animal using the transfer service
+	if err := s.transferService.TreatAnimal(req.Id); err != nil {
 		return nil, err
 	}
 
