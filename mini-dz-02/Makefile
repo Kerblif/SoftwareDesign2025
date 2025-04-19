@@ -44,9 +44,26 @@ test-coverage:
 	$(GO) test -coverprofile=coverage.out ./...
 	$(GO) tool cover -html=coverage.out
 
+# Run tests with coverage excluding generated files
+test-all:
+	@echo "Running all tests with verbose output (excluding generated files)..."
+	$(GO) test -v ./pkg/...
+	@echo "\nGenerating coverage report (excluding generated files)..."
+	$(GO) test -coverprofile=coverage.out ./pkg/...
+	@echo "\nCoverage statistics by function (excluding generated files):"
+	$(GO) tool cover -func=coverage.out
+	@echo "\nGenerating HTML coverage report (excluding generated files)..."
+	$(GO) tool cover -html=coverage.out -o coverage.html
+	@echo "\nTest coverage report generated: coverage.html"
+
 # Format code
 fmt:
 	$(GO) fmt ./...
+
+# Generate documentation (excluding generated files)
+doc:
+	@echo "Files to be included in documentation (excluding generated files):"
+	@find ./pkg -type f -name "*.go" | grep -v "_test.go" | grep -v "\.pb\.go" | grep -v "\.pb\.gw\.go"
 
 # Vet code
 vet:
@@ -79,4 +96,4 @@ docker-all: docker-build docker-run
 	@echo "To stop the container, run: make docker-stop"
 
 # Default target
-.PHONY: build run run-grpc proto proto-download clean test test-coverage fmt vet deps all docker-build docker-run docker-stop docker-clean docker-all
+.PHONY: build run run-grpc proto proto-download clean test test-coverage test-all test-all-no-gen doc fmt vet deps all docker-build docker-run docker-stop docker-clean docker-all
