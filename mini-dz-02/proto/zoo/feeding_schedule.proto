@@ -1,0 +1,121 @@
+syntax = "proto3";
+
+package zoo;
+
+option go_package = "mini-dz-02/proto/zoo";
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "zoo/common.proto";
+
+// FeedingSchedule message represents a feeding schedule for an animal
+message FeedingSchedule {
+  string id = 1;
+  string animal_id = 2;
+  google.protobuf.Timestamp feeding_time = 3;
+  FoodType food_type = 4;
+  bool completed = 5;
+  bool is_due = 6;
+}
+
+// CreateFeedingScheduleRequest is the request for creating a new feeding schedule
+message CreateFeedingScheduleRequest {
+  string id = 1;
+  string animal_id = 2;
+  google.protobuf.Timestamp feeding_time = 3;
+  FoodType food_type = 4;
+}
+
+// GetFeedingScheduleRequest is the request for getting a feeding schedule by ID
+message GetFeedingScheduleRequest {
+  string id = 1;
+}
+
+// GetFeedingSchedulesResponse is the response for getting all feeding schedules
+message GetFeedingSchedulesResponse {
+  repeated FeedingSchedule feeding_schedules = 1;
+}
+
+// DeleteFeedingScheduleRequest is the request for deleting a feeding schedule
+message DeleteFeedingScheduleRequest {
+  string id = 1;
+}
+
+// UpdateFeedingScheduleRequest is the request for updating a feeding schedule
+message UpdateFeedingScheduleRequest {
+  string id = 1;
+  google.protobuf.Timestamp feeding_time = 2;
+  FoodType food_type = 3;
+}
+
+// CompleteFeedingScheduleRequest is the request for marking a feeding schedule as completed
+message CompleteFeedingScheduleRequest {
+  string id = 1;
+}
+
+// GetFeedingSchedulesByAnimalRequest is the request for getting feeding schedules for a specific animal
+message GetFeedingSchedulesByAnimalRequest {
+  string animal_id = 1;
+}
+
+// FeedingScheduleService provides operations for managing feeding schedules
+service FeedingScheduleService {
+  // GetFeedingSchedule gets a feeding schedule by ID
+  rpc GetFeedingSchedule(GetFeedingScheduleRequest) returns (FeedingSchedule) {
+    option (google.api.http) = {
+      get: "/api/feeding-schedules/{id}"
+    };
+  }
+
+  // GetFeedingSchedules gets all feeding schedules
+  rpc GetFeedingSchedules(Empty) returns (GetFeedingSchedulesResponse) {
+    option (google.api.http) = {
+      get: "/api/feeding-schedules"
+    };
+  }
+
+  // CreateFeedingSchedule creates a new feeding schedule
+  rpc CreateFeedingSchedule(CreateFeedingScheduleRequest) returns (FeedingSchedule) {
+    option (google.api.http) = {
+      post: "/api/feeding-schedules"
+      body: "*"
+    };
+  }
+
+  // DeleteFeedingSchedule deletes a feeding schedule
+  rpc DeleteFeedingSchedule(DeleteFeedingScheduleRequest) returns (Empty) {
+    option (google.api.http) = {
+      delete: "/api/feeding-schedules/{id}"
+    };
+  }
+
+  // UpdateFeedingSchedule updates a feeding schedule
+  rpc UpdateFeedingSchedule(UpdateFeedingScheduleRequest) returns (FeedingSchedule) {
+    option (google.api.http) = {
+      put: "/api/feeding-schedules/{id}"
+      body: "*"
+    };
+  }
+
+  // CompleteFeedingSchedule marks a feeding schedule as completed
+  rpc CompleteFeedingSchedule(CompleteFeedingScheduleRequest) returns (Empty) {
+    option (google.api.http) = {
+      post: "/api/feeding-schedules/{id}/complete"
+      body: "*"
+    };
+  }
+
+  // GetDueFeedingSchedules gets feeding schedules that are due
+  rpc GetDueFeedingSchedules(Empty) returns (GetFeedingSchedulesResponse) {
+    option (google.api.http) = {
+      get: "/api/feeding-schedules/due"
+    };
+  }
+
+  // GetFeedingSchedulesByAnimal gets feeding schedules for a specific animal
+  rpc GetFeedingSchedulesByAnimal(GetFeedingSchedulesByAnimalRequest) returns (GetFeedingSchedulesResponse) {
+    option (google.api.http) = {
+      get: "/api/animals/{animal_id}/feeding-schedules"
+    };
+  }
+}
