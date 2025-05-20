@@ -1,0 +1,19 @@
+# Database configuration
+database:
+  url: postgres://postgres:postgres@postgres:5432/textanalyzer?sslmode=disable
+
+# Storage configuration
+storage:
+  path: ./storage/wordclouds
+
+# Server configuration
+server:
+  port: 50052
+
+# File Storing Service configuration
+file_storing_service:
+  address: file-storing-service:50051
+
+# Word Cloud API configuration
+wordcloud_api:
+  url: https://quickchart.io/wordcloud

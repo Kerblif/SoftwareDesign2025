@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package api_gateway;
+
+option go_package = "kr-02/internal/proto/api_gateway";
+
+import "google/api/annotations.proto";
+import "file_storing_service.proto";
+import "file_analysis_service.proto";
+
+// APIGateway is responsible for routing requests to the appropriate services
+service APIGateway {
+  // UploadFile routes file upload requests to the FileStoringService
+  rpc UploadFile(file_storing_service.UploadFileRequest) returns (file_storing_service.UploadFileResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/files"
+      body: "*"
+    };
+  }
+
+  // GetFile routes file retrieval requests to the FileStoringService
+  rpc GetFile(file_storing_service.GetFileRequest) returns (file_storing_service.GetFileResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/files/{file_id}"
+    };
+  }
+
+  // AnalyzeFile routes file analysis requests to the FileAnalysisService
+  rpc AnalyzeFile(file_analysis_service.AnalyzeFileRequest) returns (file_analysis_service.AnalyzeFileResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/analysis"
+      body: "*"
+    };
+  }
+
+  // GetWordCloud routes word cloud retrieval requests to the FileAnalysisService
+  rpc GetWordCloud(file_analysis_service.GetWordCloudRequest) returns (file_analysis_service.GetWordCloudResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/wordcloud/{location}"
+    };
+  }
+}

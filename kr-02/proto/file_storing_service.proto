@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+package file_storing_service;
+
+option go_package = "kr-02/internal/proto/file_storing_service";
+
+import "google/api/annotations.proto";
+
+// FileStoringService is responsible for storing and retrieving files
+service FileStoringService {
+  // UploadFile uploads a file and returns its ID
+  rpc UploadFile(UploadFileRequest) returns (UploadFileResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/files"
+      body: "*"
+    };
+  }
+
+  // GetFile retrieves a file by its ID
+  rpc GetFile(GetFileRequest) returns (GetFileResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/files/{file_id}"
+    };
+  }
+}
+
+// UploadFileRequest contains the file to be uploaded
+message UploadFileRequest {
+  string file_name = 1;
+  bytes content = 2;
+}
+
+// UploadFileResponse contains the ID of the uploaded file
+message UploadFileResponse {
+  string file_id = 1;
+}
+
+// GetFileRequest contains the ID of the file to retrieve
+message GetFileRequest {
+  string file_id = 1;
+}
+
+// GetFileResponse contains the content of the retrieved file
+message GetFileResponse {
+  string file_name = 1;
+  bytes content = 2;
+}

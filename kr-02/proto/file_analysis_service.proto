@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package file_analysis_service;
+
+option go_package = "kr-02/internal/proto/file_analysis_service";
+
+import "google/api/annotations.proto";
+
+// FileAnalysisService is responsible for analyzing files and storing results
+service FileAnalysisService {
+  // AnalyzeFile analyzes a file by its ID and returns the analysis results
+  rpc AnalyzeFile(AnalyzeFileRequest) returns (AnalyzeFileResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/analysis"
+      body: "*"
+    };
+  }
+
+  // GetWordCloud retrieves a word cloud image for a file by its location
+  rpc GetWordCloud(GetWordCloudRequest) returns (GetWordCloudResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/wordcloud/{location}"
+    };
+  }
+}
+
+// AnalyzeFileRequest contains the ID of the file to analyze
+message AnalyzeFileRequest {
+  string file_id = 1;
+  bool generate_word_cloud = 2; // Optional flag to generate word cloud
+}
+
+// AnalyzeFileResponse contains the analysis results
+message AnalyzeFileResponse {
+  // Statistics
+  int32 paragraph_count = 1;
+  int32 word_count = 2;
+  int32 character_count = 3;
+  
+  // Plagiarism check
+  bool is_plagiarism = 4;
+  repeated string similar_file_ids = 5; // IDs of similar files if plagiarism detected
+  
+  // Word cloud
+  string word_cloud_location = 6; // Location of the word cloud image if generated
+}
+
+// GetWordCloudRequest contains the location of the word cloud to retrieve
+message GetWordCloudRequest {
+  string location = 1;
+}
+
+// GetWordCloudResponse contains the word cloud image
+message GetWordCloudResponse {
+  bytes image = 1;
+}

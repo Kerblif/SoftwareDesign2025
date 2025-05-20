@@ -1,0 +1,12 @@
+# Server configuration
+server:
+  grpc_port: 50050
+  http_port: 8080
+
+# File Storing Service configuration
+file_storing_service:
+  address: file-storing-service:50051
+
+# File Analysis Service configuration
+file_analysis_service:
+  address: file-analysis-service:50052
