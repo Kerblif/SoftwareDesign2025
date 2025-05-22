@@ -3,6 +3,8 @@ package clients
 import (
 	"context"
 	"errors"
+	"kr-02/internal/pkg/grpcConn"
+	"net"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -110,10 +112,97 @@ func TestAnalyzeFile(t *testing.T) {
 	// Skip the retry test for now as it's causing issues with the mock
 	// We'll focus on getting the coverage up first
 	/*
-	t.Run("Retry on unavailable", func(t *testing.T) {
-		// This test is skipped for now
-	})
+		t.Run("Retry on unavailable", func(t *testing.T) {
+			// This test is skipped for now
+		})
 	*/
+}
+
+func TestNewFileAnalysisClient(t *testing.T) {
+	// Test case: invalid address
+	t.Run("Invalid address", func(t *testing.T) {
+		// Use an invalid address that will cause an error
+		client, err := NewFileAnalysisClient("invalid-address:12345")
+
+		// Assert
+		assert.Error(t, err)
+		assert.Nil(t, client)
+		assert.Contains(t, err.Error(), "failed to connect")
+	})
+
+	// Test case: valid address but no server (connection refused)
+	t.Run("Connection refused", func(t *testing.T) {
+		// Use a valid address format but no server is running
+		// Find an unused port
+		listener, err := net.Listen("tcp", "127.0.0.1:0")
+		if err != nil {
+			t.Fatalf("Failed to find unused port: %v", err)
+		}
+		addr := listener.Addr().String()
+		listener.Close() // Close the listener to free the port
+
+		// Try to connect to the port (should fail with connection refused)
+		client, err := NewFileAnalysisClient(addr)
+
+		// Assert
+		assert.Error(t, err)
+		assert.Nil(t, client)
+	})
+}
+
+func TestFileAnalysisClient_Close(t *testing.T) {
+	// Test case: nil connection
+	t.Run("Nil connection", func(t *testing.T) {
+		// Create client with nil connection
+		client := &FileAnalysisClient{
+			conn: nil,
+		}
+
+		// Call the method
+		err := client.Close()
+
+		// Assert
+		assert.NoError(t, err)
+	})
+
+	// Test case: with mock connection
+	t.Run("With connection", func(t *testing.T) {
+		// Create mock connection
+		mockConn := &grpcConn.MockGrpcClientConn{}
+		mockConn.On("Close").Return(nil)
+
+		// Create client with mock connection
+		client := &FileAnalysisClient{
+			conn: mockConn,
+		}
+
+		// Call the method
+		err := client.Close()
+
+		// Assert
+		assert.NoError(t, err)
+		mockConn.AssertExpectations(t)
+	})
+
+	// Test case: connection returns error
+	t.Run("Connection returns error", func(t *testing.T) {
+		// Create mock connection
+		mockConn := &grpcConn.MockGrpcClientConn{}
+		mockConn.On("Close").Return(errors.New("close error"))
+
+		// Create client with mock connection
+		client := &FileAnalysisClient{
+			conn: mockConn,
+		}
+
+		// Call the method
+		err := client.Close()
+
+		// Assert
+		assert.Error(t, err)
+		assert.Equal(t, "close error", err.Error())
+		mockConn.AssertExpectations(t)
+	})
 }
 
 func TestGetWordCloud(t *testing.T) {
@@ -166,8 +255,8 @@ func TestGetWordCloud(t *testing.T) {
 	// Skip the retry test for now as it's causing issues with the mock
 	// We'll focus on getting the coverage up first
 	/*
-	t.Run("Retry on unavailable", func(t *testing.T) {
-		// This test is skipped for now
-	})
+		t.Run("Retry on unavailable", func(t *testing.T) {
+			// This test is skipped for now
+		})
 	*/
 }

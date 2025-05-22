@@ -3,6 +3,7 @@ package clients
 import (
 	"context"
 	"fmt"
+	"kr-02/internal/pkg/grpcConn"
 	"time"
 
 	"google.golang.org/grpc"
@@ -16,7 +17,7 @@ import (
 // FileStoringClient provides methods for interacting with the File Storing Service
 type FileStoringClient struct {
 	client pb.FileStoringServiceClient
-	conn   *grpc.ClientConn
+	conn   grpcConn.ClientConnInterface
 }
 
 // NewFileStoringClient creates a new FileStoringClient instance

@@ -114,8 +114,13 @@ func isGeneratedFile(filePath string) bool {
 		return true
 	}
 
+	// Check if the file is a generated Swagger doc
+	if strings.Contains(filePath, "/mocks/") {
+		return true
+	}
+
 	// Check file extensions commonly associated with generated files
-	generatedExtensions := []string{".pb.go", ".pb.gw.go", ".swagger.json"}
+	generatedExtensions := []string{".pb.go", ".pb.gw.go"}
 	for _, genExt := range generatedExtensions {
 		if strings.HasSuffix(filePath, genExt) {
 			return true

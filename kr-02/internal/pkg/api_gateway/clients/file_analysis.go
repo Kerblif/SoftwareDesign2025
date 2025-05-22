@@ -3,6 +3,7 @@ package clients
 import (
 	"context"
 	"fmt"
+	"kr-02/internal/pkg/grpcConn"
 	"time"
 
 	"google.golang.org/grpc"
@@ -16,7 +17,7 @@ import (
 // FileAnalysisClient provides methods for interacting with the File Analysis Service
 type FileAnalysisClient struct {
 	client pb.FileAnalysisServiceClient
-	conn   *grpc.ClientConn
+	conn   grpcConn.ClientConnInterface
 }
 
 // NewFileAnalysisClient creates a new FileAnalysisClient instance

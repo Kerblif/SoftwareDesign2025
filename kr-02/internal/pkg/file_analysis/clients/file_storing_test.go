@@ -4,49 +4,28 @@ import (
 	"context"
 	"errors"
 	"kr-02/internal/pkg/file_analysis/clients"
-	"kr-02/internal/proto/file_storing_service"
+	pb "kr-02/internal/proto/file_storing_service"
+	"kr-02/internal/proto/file_storing_service/mocks"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"google.golang.org/grpc"
 )
-
-// Mock for the FileStoringServiceClient
-type MockFileStoringServiceClient struct {
-	mock.Mock
-}
-
-func (m *MockFileStoringServiceClient) GetFile(ctx context.Context, in *file_storing_service.GetFileRequest, opts ...grpc.CallOption) (*file_storing_service.GetFileResponse, error) {
-	args := m.Called(ctx, in)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*file_storing_service.GetFileResponse), args.Error(1)
-}
-
-func (m *MockFileStoringServiceClient) UploadFile(ctx context.Context, in *file_storing_service.UploadFileRequest, opts ...grpc.CallOption) (*file_storing_service.UploadFileResponse, error) {
-	args := m.Called(ctx, in)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*file_storing_service.UploadFileResponse), args.Error(1)
-}
 
 // Test implementation of FileStoringClient that uses the mock
 type TestFileStoringClient struct {
 	clients.FileStoringClientInterface
-	mockClient *MockFileStoringServiceClient
+	mockClient *mocks.MockFileStoringServiceClient
 }
 
-func NewTestFileStoringClient(mockClient *MockFileStoringServiceClient) *TestFileStoringClient {
+func NewTestFileStoringClient(mockClient *mocks.MockFileStoringServiceClient) *TestFileStoringClient {
 	return &TestFileStoringClient{
 		mockClient: mockClient,
 	}
 }
 
 func (c *TestFileStoringClient) GetFile(ctx context.Context, fileID string) (string, []byte, error) {
-	resp, err := c.mockClient.GetFile(ctx, &file_storing_service.GetFileRequest{
+	resp, err := c.mockClient.GetFile(ctx, &pb.GetFileRequest{
 		FileId: fileID,
 	})
 
@@ -63,15 +42,15 @@ func (c *TestFileStoringClient) Close() error {
 
 func TestGetFile(t *testing.T) {
 	// Create mock
-	mockClient := new(MockFileStoringServiceClient)
+	mockClient := new(mocks.MockFileStoringServiceClient)
 
 	// Create test client
 	client := NewTestFileStoringClient(mockClient)
 
 	// Set up mock expectations
-	mockClient.On("GetFile", mock.Anything, &file_storing_service.GetFileRequest{
+	mockClient.On("GetFile", mock.Anything, &pb.GetFileRequest{
 		FileId: "file123",
-	}).Return(&file_storing_service.GetFileResponse{
+	}).Return(&pb.GetFileResponse{
 		FileName: "test.txt",
 		Content:  []byte("test content"),
 	}, nil)
@@ -89,13 +68,13 @@ func TestGetFile(t *testing.T) {
 
 func TestGetFile_Error(t *testing.T) {
 	// Create mock
-	mockClient := new(MockFileStoringServiceClient)
+	mockClient := new(mocks.MockFileStoringServiceClient)
 
 	// Create test client
 	client := NewTestFileStoringClient(mockClient)
 
 	// Set up mock expectations
-	mockClient.On("GetFile", mock.Anything, &file_storing_service.GetFileRequest{
+	mockClient.On("GetFile", mock.Anything, &pb.GetFileRequest{
 		FileId: "file123",
 	}).Return(nil, errors.New("connection error"))
 
@@ -110,7 +89,7 @@ func TestGetFile_Error(t *testing.T) {
 
 func TestClose(t *testing.T) {
 	// Create mock
-	mockClient := new(MockFileStoringServiceClient)
+	mockClient := new(mocks.MockFileStoringServiceClient)
 
 	// Create test client
 	client := NewTestFileStoringClient(mockClient)
