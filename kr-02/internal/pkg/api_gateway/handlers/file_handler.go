@@ -1,21 +1,28 @@
 package handlers
 
 import (
+	"context"
 	"io"
 	"net/http"
+	"path/filepath"
 
 	"github.com/gin-gonic/gin"
-
-	"kr-02/internal/pkg/api_gateway/clients"
 )
+
+// FileStoringClientInterface defines the interface for the File Storing Client
+type FileStoringClientInterface interface {
+	UploadFile(ctx context.Context, fileName string, content []byte) (string, error)
+	GetFile(ctx context.Context, fileID string) (string, []byte, error)
+	Close() error
+}
 
 // FileHandler handles file-related operations
 type FileHandler struct {
-	client *clients.FileStoringClient
+	client FileStoringClientInterface
 }
 
 // NewFileHandler creates a new FileHandler instance
-func NewFileHandler(client *clients.FileStoringClient) *FileHandler {
+func NewFileHandler(client FileStoringClientInterface) *FileHandler {
 	return &FileHandler{client: client}
 }
 
@@ -37,6 +44,12 @@ func (h *FileHandler) UploadFile(c *gin.Context) {
 		return
 	}
 	defer file.Close()
+
+	// Check if the file is a .txt file
+	if filepath.Ext(header.Filename) != ".txt" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Only .txt files are allowed"})
+		return
+	}
 
 	content, err := io.ReadAll(file)
 	if err != nil {

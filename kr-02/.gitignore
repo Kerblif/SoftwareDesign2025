@@ -4,3 +4,4 @@ proto/grafeas
 internal/proto
 api
 *docs
+coverage

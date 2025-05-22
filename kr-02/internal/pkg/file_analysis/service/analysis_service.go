@@ -14,7 +14,7 @@ import (
 type AnalysisService struct {
 	repo               repository.AnalysisRepository
 	storage            storage.WordCloudStorage
-	fileStoringClient  *clients.FileStoringClient
+	fileStoringClient  clients.FileStoringClientInterface
 	textAnalyzer       *analyzer.TextAnalyzer
 	plagiarismChecker  *analyzer.PlagiarismChecker
 	wordCloudGenerator *analyzer.WordCloudGenerator
@@ -24,7 +24,7 @@ type AnalysisService struct {
 func NewAnalysisService(
 	repo repository.AnalysisRepository,
 	storage storage.WordCloudStorage,
-	fileStoringClient *clients.FileStoringClient,
+	fileStoringClient clients.FileStoringClientInterface,
 	textAnalyzer *analyzer.TextAnalyzer,
 	plagiarismChecker *analyzer.PlagiarismChecker,
 	wordCloudGenerator *analyzer.WordCloudGenerator,
