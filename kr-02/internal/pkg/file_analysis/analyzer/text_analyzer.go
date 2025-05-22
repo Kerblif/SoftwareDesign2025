@@ -31,9 +31,7 @@ func NewTextAnalyzer() *TextAnalyzer {
 
 // AnalyzeText analyzes text content and returns statistics
 func (a *TextAnalyzer) AnalyzeText(content string) (paragraphCount, wordCount, characterCount int32) {
-	// Count paragraphs (separated by double newlines)
 	paragraphs := strings.Split(content, "\n\n")
-	// Filter out empty paragraphs
 	var nonEmptyParagraphs []string
 	for _, p := range paragraphs {
 		if strings.TrimSpace(p) != "" {
@@ -42,11 +40,9 @@ func (a *TextAnalyzer) AnalyzeText(content string) (paragraphCount, wordCount, c
 	}
 	paragraphCount = int32(len(nonEmptyParagraphs))
 
-	// Count words
 	words := strings.Fields(content)
 	wordCount = int32(len(words))
 
-	// Count characters (including whitespace)
 	characterCount = int32(len(content))
 
 	return paragraphCount, wordCount, characterCount
@@ -59,10 +55,8 @@ func (a *TextAnalyzer) GetWords(content string) []string {
 
 // GetSignificantWords returns words after removing stop words and punctuation
 func (a *TextAnalyzer) GetSignificantWords(content string) []string {
-	// Convert to lowercase
 	content = strings.ToLower(content)
 
-	// Remove punctuation
 	var sb strings.Builder
 	for _, r := range content {
 		if !unicode.IsPunct(r) {
@@ -73,10 +67,8 @@ func (a *TextAnalyzer) GetSignificantWords(content string) []string {
 	}
 	content = sb.String()
 
-	// Split into words
 	words := strings.Fields(content)
 
-	// Filter out stop words
 	var significantWords []string
 	for _, word := range words {
 		if !a.StopWords[word] {
@@ -105,7 +97,6 @@ func (a *TextAnalyzer) GetNGrams(content string, n int) []string {
 
 // RemoveExcessWhitespace normalizes whitespace in text
 func (a *TextAnalyzer) RemoveExcessWhitespace(text string) string {
-	// Replace multiple spaces, tabs, and newlines with a single space
 	re := regexp.MustCompile(`\s+`)
 	return re.ReplaceAllString(text, " ")
 }

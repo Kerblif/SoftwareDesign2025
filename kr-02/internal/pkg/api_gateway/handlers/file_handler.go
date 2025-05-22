@@ -45,7 +45,6 @@ func (h *FileHandler) UploadFile(c *gin.Context) {
 	}
 	defer file.Close()
 
-	// Check if the file is a .txt file
 	if filepath.Ext(header.Filename) != ".txt" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Only .txt files are allowed"})
 		return

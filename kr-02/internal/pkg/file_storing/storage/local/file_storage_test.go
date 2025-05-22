@@ -53,6 +53,24 @@ func TestNewLocalStorage(t *testing.T) {
 		_, err = os.Stat(relativeDir)
 		assert.NoError(t, err)
 	})
+
+	// Test error when creating directory fails
+	t.Run("MkdirAll error", func(t *testing.T) {
+		// Create a file with the same name as the directory we'll try to create
+		// This will cause MkdirAll to fail because a file exists with that name
+		filePath := filepath.Join(tempDir, "file-as-dir")
+		err := os.WriteFile(filePath, []byte("test"), 0644)
+		require.NoError(t, err)
+
+		// Try to create a storage with a path that includes the file as a directory
+		invalidPath := filepath.Join(filePath, "subdir")
+		storage, err := local.NewLocalStorage(invalidPath)
+
+		// Should fail because we can't create a directory with the same name as a file
+		assert.Error(t, err)
+		assert.Nil(t, storage)
+		assert.Contains(t, err.Error(), "failed to create storage directory")
+	})
 }
 
 func TestSaveFile(t *testing.T) {
@@ -138,6 +156,37 @@ func TestSaveFile(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, secondContent, savedSecondContent)
 	})
+
+	// Test error when creating directory fails
+	t.Run("MkdirAll error", func(t *testing.T) {
+		// Create a file with the same name as the directory we'll try to create
+		filePath := filepath.Join(tempDir, "file-as-dir-save")
+		err := os.WriteFile(filePath, []byte("test"), 0644)
+		require.NoError(t, err)
+
+		// Try to save a file in a subdirectory of the file (which will fail)
+		badLocation := filepath.Join("file-as-dir-save", "test.txt")
+		err = storage.SaveFile(context.Background(), badLocation, testContent)
+
+		// Should fail because we can't create a directory with the same name as a file
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "failed to create directory")
+	})
+
+	// Test error when writing file fails
+	t.Run("WriteFile error", func(t *testing.T) {
+		// Create a directory with the same name as the file we'll try to create
+		dirPath := filepath.Join(tempDir, "dir-as-file")
+		err := os.MkdirAll(dirPath, 0755)
+		require.NoError(t, err)
+
+		// Try to save a file with the same name as the directory (which will fail)
+		err = storage.SaveFile(context.Background(), "dir-as-file", testContent)
+
+		// Should fail because we can't create a file with the same name as a directory
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "failed to write file")
+	})
 }
 
 func TestGetFile(t *testing.T) {
@@ -192,6 +241,21 @@ func TestGetFile(t *testing.T) {
 		retrievedEmptyFile, err := storage.GetFile(context.Background(), "empty.txt")
 		assert.NoError(t, err)
 		assert.Empty(t, retrievedEmptyFile)
+	})
+
+	// Test error when reading file fails (not due to file not existing)
+	t.Run("ReadFile error", func(t *testing.T) {
+		// Create a directory with the same name as the file we'll try to read
+		dirPath := filepath.Join(tempDir, "dir-as-file-read")
+		err := os.MkdirAll(dirPath, 0755)
+		require.NoError(t, err)
+
+		// Try to read a "file" with the same name as the directory (which will fail)
+		_, err = storage.GetFile(context.Background(), "dir-as-file-read")
+
+		// Should fail because we can't read a directory as a file
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "failed to read file")
 	})
 }
 
