@@ -12,11 +12,11 @@ import (
 
 // AnalysisService handles the business logic for file analysis operations
 type AnalysisService struct {
-	repo             repository.AnalysisRepository
-	storage          storage.WordCloudStorage
-	fileStoringClient *clients.FileStoringClient
-	textAnalyzer     *analyzer.TextAnalyzer
-	plagiarismChecker *analyzer.PlagiarismChecker
+	repo               repository.AnalysisRepository
+	storage            storage.WordCloudStorage
+	fileStoringClient  *clients.FileStoringClient
+	textAnalyzer       *analyzer.TextAnalyzer
+	plagiarismChecker  *analyzer.PlagiarismChecker
 	wordCloudGenerator *analyzer.WordCloudGenerator
 }
 
@@ -101,10 +101,15 @@ func (s *AnalysisService) AnalyzeFile(ctx context.Context, fileID string, genera
 
 	// Generate word cloud if requested
 	if generateWordCloud {
-		words := s.textAnalyzer.GetWords(contentStr)
-		
+		var text []byte
+		_, text, err = s.fileStoringClient.GetFile(ctx, fileID)
+
+		if err != nil {
+			return 0, 0, 0, false, nil, "", fmt.Errorf("failed to get file content: %w", err)
+		}
+
 		// Generate word cloud
-		wordCloudImage, location, err := s.wordCloudGenerator.GenerateWordCloud(ctx, words)
+		wordCloudImage, location, err := s.wordCloudGenerator.GenerateWordCloud(ctx, string(text))
 		if err != nil {
 			// Log the error but continue without word cloud
 			fmt.Printf("Failed to generate word cloud: %v\n", err)

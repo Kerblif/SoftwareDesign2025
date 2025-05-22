@@ -58,28 +58,15 @@ services:
       context: .
       dockerfile: ./build/api_gateway/Dockerfile
     environment:
-      GRPC_PORT: "50050"
       HTTP_PORT: "8080"
       FILE_STORING_SERVICE_ADDRESS: "file-storing-service:50051"
       FILE_ANALYSIS_SERVICE_ADDRESS: "file-analysis-service:50052"
+      GIN_MODE: "release"
     depends_on:
       - file-storing-service
       - file-analysis-service
     ports:
-      - "50050:50050"
       - "8080:8080"
-
-  swagger-ui:
-    image: swaggerapi/swagger-ui
-    environment:
-      SWAGGER_JSON: /swagger/api.swagger.json
-      BASE_URL: /swagger
-    volumes:
-      - ./api/swagger:/swagger
-    ports:
-      - "8081:8080"
-    depends_on:
-      - api-gateway
 
 volumes:
   postgres_data:

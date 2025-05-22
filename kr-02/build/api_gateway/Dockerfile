@@ -23,13 +23,13 @@ WORKDIR /app
 COPY --from=builder /app/api-gateway .
 
 # Set environment variables
-ENV GRPC_PORT=50050
 ENV HTTP_PORT=8080
 ENV FILE_STORING_SERVICE_ADDRESS="file-storing-service:50051"
 ENV FILE_ANALYSIS_SERVICE_ADDRESS="file-analysis-service:50052"
+ENV GIN_MODE=release
 
-# Expose the ports
-EXPOSE 50050 8080
+# Expose the port
+EXPOSE 8080
 
 # Run the application
 CMD ["./api-gateway"]

@@ -14,8 +14,10 @@ The system consists of three microservices:
 
 - Docker and Docker Compose
 - Go 1.20 or later
-- Protocol Buffers compiler (protoc)
-- jq (for merging Swagger files)
+- Swag (for generating Swagger documentation)
+  ```bash
+  go install github.com/swaggo/swag/cmd/swag@latest
+  ```
 
 ## Getting Started
 
@@ -26,16 +28,10 @@ git clone <repository-url>
 cd kr-02
 ```
 
-### Download Google Proto Files
+### Generate Swagger Documentation
 
 ```bash
-make proto-download
-```
-
-### Generate Proto Files
-
-```bash
-make proto
+make swagger
 ```
 
 ### Build and Run the Services
@@ -48,7 +44,7 @@ This will start all the services:
 - PostgreSQL database on port 5432
 - File Storing Service on port 50051
 - File Analysis Service on port 50052
-- API Gateway on ports 50050 (gRPC) and 8080 (HTTP)
+- API Gateway on port 8080 (HTTP)
 - Swagger UI on port 8081
 
 ## API Documentation
@@ -59,6 +55,8 @@ This will start all the services:
 make swagger
 ```
 
+This will generate Swagger documentation using swag based on the annotations in the code.
+
 ### Access Swagger UI
 
 ```bash
@@ -66,6 +64,8 @@ make swagger-ui
 ```
 
 Then open http://localhost:8081 in your browser to view the API documentation.
+
+You can also access the Swagger UI directly from the API Gateway at http://localhost:8080/swagger/index.html.
 
 ## API Endpoints
 
@@ -75,12 +75,11 @@ Then open http://localhost:8081 in your browser to view the API documentation.
 POST /api/v1/files
 ```
 
-Request body:
-```json
-{
-  "file_name": "example.txt",
-  "content": "base64-encoded-content"
-}
+Request: multipart/form-data with a file field named "file"
+
+Example using curl:
+```bash
+curl -X POST -F "file=@example.txt" http://localhost:8080/api/v1/files
 ```
 
 Response:
@@ -96,12 +95,11 @@ Response:
 GET /api/v1/files/{file_id}
 ```
 
-Response:
-```json
-{
-  "file_name": "example.txt",
-  "content": "base64-encoded-content"
-}
+Response: Binary file content with appropriate Content-Disposition header for download
+
+Example using curl:
+```bash
+curl -OJ http://localhost:8080/api/v1/files/{file_id}
 ```
 
 ### Analyze a File
@@ -136,7 +134,12 @@ Response:
 GET /api/v1/wordcloud/{location}
 ```
 
-Response: Word cloud image (binary data)
+Response: Word cloud image (binary data) with Content-Type: image/png
+
+Example using curl:
+```bash
+curl -o wordcloud.png http://localhost:8080/api/v1/wordcloud/{location}
+```
 
 ## Development
 
@@ -144,8 +147,6 @@ Response: Word cloud image (binary data)
 
 ```
 kr-02/
-├── api/                      # API documentation
-│   └── swagger/              # Swagger files
 ├── build/                    # Dockerfiles
 │   ├── api_gateway/
 │   ├── file_analysis_service/
@@ -157,8 +158,14 @@ kr-02/
 ├── configs/                  # Configuration files
 ├── internal/                 # Internal packages
 │   ├── pkg/                  # Shared packages
-│   └── proto/                # Generated proto files
-├── proto/                    # Proto definitions
+│   │   ├── api_gateway/      # API Gateway implementation
+│   │   │   ├── clients/      # Service clients
+│   │   │   ├── docs/         # Generated Swagger docs
+│   │   │   └── handlers/     # HTTP handlers
+│   │   ├── file_analysis/    # File Analysis Service implementation
+│   │   └── file_storing/     # File Storing Service implementation
+│   └── proto/                # Generated proto files for gRPC services
+├── proto/                    # Proto definitions for gRPC services
 ├── scripts/                  # Utility scripts
 └── tests/                    # Tests
 ```
