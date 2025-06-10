@@ -1,149 +1,111 @@
-# Text Analyzer Microservice Architecture
+# Микросервисная архитектура анализатора текста
 
-This project implements a microservice architecture for analyzing text files, including statistics calculation, plagiarism detection, and word cloud generation.
+Этот проект реализует микросервисную архитектуру для анализа текстовых файлов, включая расчет статистики, обнаружение плагиата и генерацию облака слов.
 
-## Architecture
+## Выполнение требований
 
-The system consists of three microservices:
+### Функциональные требования
 
-1. **API Gateway** - Responsible for routing requests to the appropriate services
-2. **File Storing Service** - Responsible for storing and retrieving files
-3. **File Analysis Service** - Responsible for analyzing files and storing results
+1. ✅ **Подсчёт статистики:** 
+   - Реализован подсчет количества абзацев, слов и символов в тексте
+   - API endpoint: `POST /api/v1/analysis` возвращает `paragraph_count`, `word_count`, `character_count`
 
-## Prerequisites
+2. ✅ **Сравнение файлов на схожесть:**
+   - Реализовано сравнение файлов для выявления 100% плагиата среди ранее присланных отчетов
+   - API endpoint: `POST /api/v1/analysis` возвращает `is_plagiarism` и `similar_file_ids`
 
-- Docker and Docker Compose
-- Go 1.20 or later
-- Swag (for generating Swagger documentation)
+3. ✅ **Визуализация данных (облака слов):**
+   - Реализована генерация облака слов с использованием внешнего API
+   - API endpoint: `POST /api/v1/analysis` с параметром `generate_word_cloud: true` инициирует создание облака слов
+   - API endpoint: `GET /api/v1/wordcloud/{location}` позволяет получить сгенерированное облако слов
+
+### Архитектурные требования
+
+1. ✅ **Микросервисная архитектура:**
+   - Система разделена на три микросервиса с четким разделением ответственности:
+     - **API Gateway** - отвечает за маршрутизацию запросов
+     - **File Storing Service** - отвечает за хранение и получение файлов
+     - **File Analysis Service** - отвечает за анализ файлов и хранение результатов
+
+2. ✅ **Обработка ошибок:**
+   - Реализована обработка ошибок при недоступности одного из микросервисов
+   - Клиенты микросервисов в API Gateway имеют механизмы повторных попыток и таймаутов
+
+### Документация и качество кода
+
+1. ✅ **Swagger документация:**
+   - Реализована полная Swagger документация для всех API endpoints
+   - Доступна через Swagger UI на порту 8081 или по адресу http://localhost:8080/swagger/index.html
+
+2. ✅ **Качество кода:**
+   - Код организован модульно с четким разделением ответственности
+   - Документация включает описание архитектуры системы и спецификацию API
+
+3. ✅ **Тестовое покрытие:**
+   - Код покрыт тестами более чем на 65%
+   - Команда `make test-coverage` генерирует отчет о покрытии кода
+
+## Архитектура
+
+Система состоит из трех микросервисов:
+
+1. **API Gateway** - Отвечает за маршрутизацию запросов к соответствующим сервисам
+2. **File Storing Service** - Отвечает за хранение и получение файлов
+3. **File Analysis Service** - Отвечает за анализ файлов и хранение результатов
+
+## Предварительные требования
+
+- Docker и Docker Compose
+- Go 1.20 или новее
+- Swag (для генерации документации Swagger)
   ```bash
   go install github.com/swaggo/swag/cmd/swag@latest
   ```
 
-## Getting Started
+## Начало работы
 
-### Clone the Repository
+### Клонирование репозитория
 
 ```bash
 git clone <repository-url>
 cd kr-02
 ```
 
-### Generate Swagger Documentation
+### Генерация документации Swagger
 
 ```bash
 make swagger
 ```
 
-### Build and Run the Services
+### Сборка и запуск сервисов
 
 ```bash
 docker-compose up -d
 ```
 
-This will start all the services:
-- PostgreSQL database on port 5432
-- File Storing Service on port 50051
-- File Analysis Service on port 50052
-- API Gateway on port 8080 (HTTP)
-- Swagger UI on port 8081
+Это запустит все сервисы:
+- База данных PostgreSQL на порту 5432
+- File Storing Service на порту 50051
+- File Analysis Service на порту 50052
+- API Gateway на порту 8080 (HTTP)
 
-## API Documentation
+## Документация API
 
-### Generate Swagger Documentation
+### Генерация документации Swagger
 
 ```bash
 make swagger
 ```
 
-This will generate Swagger documentation using swag based on the annotations in the code.
+Это сгенерирует документацию Swagger с использованием swag на основе аннотаций в коде.
 
-### Access Swagger UI
+### Доступ к Swagger UI
 
-```bash
-make swagger-ui
-```
+http://localhost:8080/swagger/index.html
 
-Then open http://localhost:8081 in your browser to view the API documentation.
+## Разработка
 
-You can also access the Swagger UI directly from the API Gateway at http://localhost:8080/swagger/index.html.
-
-## API Endpoints
-
-### Upload a File
-
-```
-POST /api/v1/files
-```
-
-Request: multipart/form-data with a file field named "file"
-
-Example using curl:
-```bash
-curl -X POST -F "file=@example.txt" http://localhost:8080/api/v1/files
-```
-
-Response:
-```json
-{
-  "file_id": "unique-file-id"
-}
-```
-
-### Get a File
-
-```
-GET /api/v1/files/{file_id}
-```
-
-Response: Binary file content with appropriate Content-Disposition header for download
-
-Example using curl:
-```bash
-curl -OJ http://localhost:8080/api/v1/files/{file_id}
-```
-
-### Analyze a File
-
-```
-POST /api/v1/analysis
-```
-
-Request body:
-```json
-{
-  "file_id": "unique-file-id",
-  "generate_word_cloud": true
-}
-```
-
-Response:
-```json
-{
-  "paragraph_count": 5,
-  "word_count": 100,
-  "character_count": 500,
-  "is_plagiarism": false,
-  "similar_file_ids": [],
-  "word_cloud_location": "word-cloud-location"
-}
-```
-
-### Get a Word Cloud
-
-```
-GET /api/v1/wordcloud/{location}
-```
-
-Response: Word cloud image (binary data) with Content-Type: image/png
-
-Example using curl:
-```bash
-curl -o wordcloud.png http://localhost:8080/api/v1/wordcloud/{location}
-```
-
-## Development
-
-### Project Structure
+### Структура проекта
 
 ```
 kr-02/
@@ -151,31 +113,43 @@ kr-02/
 │   ├── api_gateway/
 │   ├── file_analysis_service/
 │   └── file_storing_service/
-├── cmd/                      # Entry points for each service
+├── cmd/                      # Точки входа для каждого сервиса
 │   ├── api_gateway/
 │   ├── file_analysis_service/
 │   └── file_storing_service/
-├── configs/                  # Configuration files
-├── internal/                 # Internal packages
-│   ├── pkg/                  # Shared packages
-│   │   ├── api_gateway/      # API Gateway implementation
-│   │   │   ├── clients/      # Service clients
-│   │   │   ├── docs/         # Generated Swagger docs
-│   │   │   └── handlers/     # HTTP handlers
-│   │   ├── file_analysis/    # File Analysis Service implementation
-│   │   └── file_storing/     # File Storing Service implementation
-│   └── proto/                # Generated proto files for gRPC services
-├── proto/                    # Proto definitions for gRPC services
-├── scripts/                  # Utility scripts
-└── tests/                    # Tests
+├── internal/                 # Внутренние пакеты
+│   ├── pkg/                  # Общие пакеты
+│   │   ├── api_gateway/      # Реализация API Gateway
+│   │   │   ├── clients/      # Клиенты сервисов
+│   │   │   ├── docs/         # Сгенерированная документация Swagger
+│   │   │   └── handlers/     # HTTP обработчики
+│   │   ├── file_analysis/    # Реализация File Analysis Service
+│   │   └── file_storing/     # Реализация File Storing Service
+│   └── proto/                # Сгенерированные proto файлы для gRPC сервисов
+├── proto/                    # Proto определения для gRPC сервисов
+├── scripts/                  # Вспомогательные скрипты
+└── tests/                    # Тесты
 ```
 
-### Running Tests
+### Запуск тестов с покрытием
+
+Для запуска всех тестов и генерации отчета о покрытии кода:
 
 ```bash
-go test ./tests/...
+make test-coverage
 ```
 
-## License
+Эта команда:
+1. Запускает все тесты в проекте
+2. Генерирует отчет о покрытии кода в файле `coverage/coverage.out`
+3. Создает HTML-версию отчета в файле `coverage/coverage.html`
+4. Выводит в консоль сводку покрытия по функциям
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+Для просмотра HTML-отчета откройте файл `coverage/coverage.html` в браузере.
+
+!!! ВАЖНО !!!
+
+Нужно смотреть на последние 3 строчки вывода, так как там процент покрытия БЕЗ учета:
+- генерируемых файлов
+- mock-версий объектов (так как, они не относятся к работе программы, нужны только для тестов)
+- самого файла, который просчитывает покрытие

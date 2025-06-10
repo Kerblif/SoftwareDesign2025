@@ -1,20 +1,28 @@
 package handlers
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 
-	"kr-02/internal/pkg/api_gateway/clients"
+	pb "kr-02/internal/proto/file_analysis_service"
 )
+
+// FileAnalysisClientInterface defines the interface for the File Analysis Client
+type FileAnalysisClientInterface interface {
+	AnalyzeFile(ctx context.Context, fileID string, generateWordCloud bool) (*pb.AnalyzeFileResponse, error)
+	GetWordCloud(ctx context.Context, location string) ([]byte, error)
+	Close() error
+}
 
 // AnalysisHandler handles file analysis operations
 type AnalysisHandler struct {
-	client *clients.FileAnalysisClient
+	client FileAnalysisClientInterface
 }
 
 // NewAnalysisHandler creates a new AnalysisHandler instance
-func NewAnalysisHandler(client *clients.FileAnalysisClient) *AnalysisHandler {
+func NewAnalysisHandler(client FileAnalysisClientInterface) *AnalysisHandler {
 	return &AnalysisHandler{client: client}
 }
 
