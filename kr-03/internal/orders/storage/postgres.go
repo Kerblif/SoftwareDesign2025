@@ -20,12 +20,12 @@ type Repository interface {
 	GetOrderByID(ctx context.Context, id int64) (*models.Order, error)
 	GetOrdersByUserID(ctx context.Context, userID int64) ([]*models.Order, error)
 	UpdateOrderStatus(ctx context.Context, id int64, status models.OrderStatus) error
-	
+
 	// Outbox operations
 	SaveOutboxMessage(ctx context.Context, tx *sqlx.Tx, message *models.OutboxMessage) error
 	GetUnsendOutboxMessages(ctx context.Context, limit int) ([]*models.OutboxMessage, error)
 	MarkOutboxMessageAsSent(ctx context.Context, messageID string) error
-	
+
 	// Transaction management
 	BeginTx(ctx context.Context) (*sqlx.Tx, error)
 	CommitTx(tx *sqlx.Tx) error
@@ -93,7 +93,7 @@ func (r *PostgresRepository) CreateOrder(ctx context.Context, tx *sqlx.Tx, order
 		VALUES ($1, $2, $3, $4, $5, $6)
 		RETURNING id
 	`
-	
+
 	var err error
 	if tx != nil {
 		err = tx.QueryRowContext(
@@ -108,11 +108,11 @@ func (r *PostgresRepository) CreateOrder(ctx context.Context, tx *sqlx.Tx, order
 			order.CreatedAt, order.UpdatedAt,
 		).Scan(&order.ID)
 	}
-	
+
 	if err != nil {
 		return fmt.Errorf("failed to create order: %w", err)
 	}
-	
+
 	return nil
 }
 
@@ -157,7 +157,7 @@ func (r *PostgresRepository) SaveOutboxMessage(ctx context.Context, tx *sqlx.Tx,
 		INSERT INTO outbox (message_id, topic, key, value, sent, created_at, updated_at)
 		VALUES ($1, $2, $3, $4, $5, $6, $7)
 	`
-	
+
 	var err error
 	if tx != nil {
 		_, err = tx.ExecContext(
@@ -172,11 +172,11 @@ func (r *PostgresRepository) SaveOutboxMessage(ctx context.Context, tx *sqlx.Tx,
 			message.Sent, message.CreatedAt, message.UpdatedAt,
 		)
 	}
-	
+
 	if err != nil {
 		return fmt.Errorf("failed to save outbox message: %w", err)
 	}
-	
+
 	return nil
 }
 
@@ -188,13 +188,13 @@ func (r *PostgresRepository) GetUnsendOutboxMessages(ctx context.Context, limit 
 		ORDER BY created_at ASC
 		LIMIT $1
 	`
-	
+
 	var messages []*models.OutboxMessage
 	err := r.db.SelectContext(ctx, &messages, query, limit)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get unsent outbox messages: %w", err)
 	}
-	
+
 	return messages, nil
 }
 
@@ -205,12 +205,12 @@ func (r *PostgresRepository) MarkOutboxMessageAsSent(ctx context.Context, messag
 		SET sent = true, updated_at = $1
 		WHERE message_id = $2
 	`
-	
+
 	_, err := r.db.ExecContext(ctx, query, time.Now(), messageID)
 	if err != nil {
 		return fmt.Errorf("failed to mark outbox message as sent: %w", err)
 	}
-	
+
 	return nil
 }
 

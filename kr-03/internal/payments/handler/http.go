@@ -55,6 +55,11 @@ func (h *Handler) Deposit(c *gin.Context) {
 		return
 	}
 
+	if req.Amount <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "amount must be greater than 0"})
+		return
+	}
+
 	err := h.paymentSvc.Deposit(c.Request.Context(), req.UserID, req.Amount)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

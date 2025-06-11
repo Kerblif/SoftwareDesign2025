@@ -78,7 +78,7 @@ func (h *Handler) GetOrders(c *gin.Context) {
 	}
 
 	// Convert to response models
-	var responses []*models.OrderResponse
+	var responses = make([]*models.OrderResponse, 0)
 	for _, order := range orders {
 		responses = append(responses, &models.OrderResponse{
 			ID:          order.ID,
@@ -90,7 +90,8 @@ func (h *Handler) GetOrders(c *gin.Context) {
 		})
 	}
 
-	c.JSON(http.StatusOK, responses)
+	// Wrap the array in an object with a "data" field to make it compatible with KrakenD
+	c.JSON(http.StatusOK, gin.H{"orders": responses})
 }
 
 // GetOrder handles the request to get a specific order
