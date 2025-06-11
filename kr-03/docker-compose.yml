@@ -102,6 +102,15 @@ services:
       - orders-service
       - payments-service
 
+  web-site:
+    build:
+      context: .
+      dockerfile: cmd/client-app/Dockerfile
+    container_name: web-site
+    depends_on:
+      - api-gateway
+      - orders-service
+
   nginx-proxy:
     image: nginx:alpine
     container_name: nginx-proxy
