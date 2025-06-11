@@ -109,14 +109,8 @@ func (h *WebSocketHandler) NotifyOrderStatusChange(ctx context.Context, order *m
 		return
 	}
 
-	// Create notification message
-	notification := map[string]interface{}{
-		"order_id": order.ID,
-		"status":   order.Status,
-	}
-
 	// Marshal notification to JSON
-	notificationBytes, err := json.Marshal(notification)
+	notificationBytes, err := json.Marshal(order)
 	if err != nil {
 		log.Printf("Failed to marshal notification: %v", err)
 		return
@@ -124,10 +118,9 @@ func (h *WebSocketHandler) NotifyOrderStatusChange(ctx context.Context, order *m
 
 	// Send notification to all connected clients
 	for _, conn := range conns {
-		err := conn.WriteMessage(websocket.TextMessage, notificationBytes)
+		err = conn.WriteMessage(websocket.TextMessage, notificationBytes)
 		if err != nil {
 			log.Printf("Failed to send notification: %v", err)
-			// Connection might be closed, but we'll let the read loop handle it
 		}
 	}
 }

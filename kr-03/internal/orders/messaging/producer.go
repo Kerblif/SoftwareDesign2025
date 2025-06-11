@@ -16,14 +16,14 @@ import (
 
 // Producer represents a Kafka producer for payment requests
 type Producer struct {
-	writer         *kafka.Writer
-	reader         *kafka.Reader
-	repo           storage.Repository
-	orderSvc       service.OrderService
-	wsHandler      WebSocketNotifier
-	outboxPoller   *OutboxPoller
-	stopCh         chan struct{}
-	readerStopCh   chan struct{}
+	writer       *kafka.Writer
+	reader       *kafka.Reader
+	repo         storage.Repository
+	orderSvc     service.OrderService
+	wsHandler    WebSocketNotifier
+	outboxPoller *OutboxPoller
+	stopCh       chan struct{}
+	readerStopCh chan struct{}
 }
 
 // WebSocketNotifier defines the interface for notifying WebSocket clients

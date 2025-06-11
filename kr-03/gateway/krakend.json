@@ -4,7 +4,7 @@
   "port": 8080,
   "endpoints": [
     {
-      "endpoint": "/orders",
+      "endpoint": "/api/v1/orders",
       "method": "POST",
       "backend": [
         {
@@ -16,7 +16,7 @@
       ]
     },
     {
-      "endpoint": "/orders",
+      "endpoint": "/api/v1/orders",
       "method": "GET",
       "input_query_strings": [
         "user_id"
@@ -31,7 +31,7 @@
       ]
     },
     {
-      "endpoint": "/orders/{id}",
+      "endpoint": "/api/v1/orders/{id}",
       "method": "GET",
       "backend": [
         {
@@ -43,7 +43,7 @@
       ]
     },
     {
-      "endpoint": "/health/orders",
+      "endpoint": "/api/v1/health/orders",
       "method": "GET",
       "backend": [
         {
@@ -55,7 +55,7 @@
       ]
     },
     {
-      "endpoint": "/payments/account",
+      "endpoint": "/api/v1/payments/account",
       "method": "POST",
       "backend": [
         {
@@ -67,7 +67,7 @@
       ]
     },
     {
-      "endpoint": "/payments/deposit",
+      "endpoint": "/api/v1/payments/deposit",
       "method": "POST",
       "backend": [
         {
@@ -79,7 +79,7 @@
       ]
     },
     {
-      "endpoint": "/payments/balance",
+      "endpoint": "/api/v1/payments/balance",
       "method": "GET",
       "input_query_strings": [
         "user_id"
@@ -94,7 +94,7 @@
       ]
     },
     {
-      "endpoint": "/health/payments",
+      "endpoint": "/api/v1/health/payments",
       "method": "GET",
       "backend": [
         {

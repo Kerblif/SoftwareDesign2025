@@ -45,7 +45,7 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	if err := consumer.Start(ctx); err != nil {
+	if err = consumer.Start(ctx); err != nil {
 		log.Fatalf("Failed to start consumer: %v", err)
 	}
 	defer consumer.Stop()
