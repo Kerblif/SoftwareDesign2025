@@ -1,0 +1,39 @@
+{
+  "version": 3,
+  "$schema": "https://www.krakend.io/schema/v3.json",
+  "port": 8080,
+  "endpoints": [
+    {
+      "endpoint": "/orders", "method": "POST",
+      "backend": [{"url_pattern": "/orders", "host": ["http://orders-service:8001"]}]
+    },
+    {
+      "endpoint": "/orders", "method": "GET",
+      "backend": [{"url_pattern": "/orders", "host": ["http://orders-service:8001"]}]
+    },
+    {
+      "endpoint": "/orders/{id}", "method": "GET",
+      "backend": [{"url_pattern": "/orders/{id}", "host": ["http://orders-service:8001"]}]
+    },
+    {
+      "endpoint": "/health/orders", "method": "GET",
+      "backend": [{"url_pattern": "/health", "host": ["http://orders-service:8001"]}]
+    },
+    {
+      "endpoint": "/payments/account", "method": "POST",
+      "backend": [{"url_pattern": "/account", "host": ["http://payments-service:8002"]}]
+    },
+    {
+      "endpoint": "/payments/deposit", "method": "POST",
+      "backend": [{"url_pattern": "/deposit", "host": ["http://payments-service:8002"]}]
+    },
+    {
+      "endpoint": "/payments/balance", "method": "GET",
+      "backend": [{"url_pattern": "/balance", "host": ["http://payments-service:8002"]}]
+    },
+    {
+      "endpoint": "/health/payments", "method": "GET",
+      "backend": [{"url_pattern": "/health", "host": ["http://payments-service:8002"]}]
+    }
+  ]
+}

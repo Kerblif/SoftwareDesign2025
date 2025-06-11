@@ -1,0 +1,24 @@
+# Git
+.git
+.gitignore
+.github
+
+# Docker
+docker-compose.yml
+.dockerignore
+
+# Documentation and planning
+*.md
+
+# Build artifacts and temporary files
+bin/
+tmp/
+*.log
+*.out
+
+# IDE and editor files
+.idea/
+
+# OS specific files
+.DS_Store
+Thumbs.db
