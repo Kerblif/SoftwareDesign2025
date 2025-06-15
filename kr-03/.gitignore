@@ -5,6 +5,6 @@
 *.so
 *.dylib
 *.test
-*.out
+coverage.*
 .DS_Store
 vendor/

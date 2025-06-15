@@ -19,17 +19,17 @@ type Repository interface {
 	CreateAccount(ctx context.Context, userID int64) (*models.Account, error)
 	GetAccountByUserID(ctx context.Context, userID int64) (*models.Account, error)
 	UpdateBalance(ctx context.Context, userID int64, amount float64) error
-	
+
 	// Inbox operations
 	SaveInboxMessage(ctx context.Context, tx *sqlx.Tx, message *models.InboxMessage) error
 	GetUnprocessedInboxMessages(ctx context.Context, limit int) ([]*models.InboxMessage, error)
 	MarkInboxMessageAsProcessed(ctx context.Context, tx *sqlx.Tx, messageID string) error
-	
+
 	// Outbox operations
 	SaveOutboxMessage(ctx context.Context, tx *sqlx.Tx, message *models.OutboxMessage) error
 	GetUnsendOutboxMessages(ctx context.Context, limit int) ([]*models.OutboxMessage, error)
 	MarkOutboxMessageAsSent(ctx context.Context, messageID string) error
-	
+
 	// Transaction management
 	BeginTx(ctx context.Context) (*sqlx.Tx, error)
 	CommitTx(tx *sqlx.Tx) error
@@ -187,6 +187,7 @@ func (r *PostgresRepository) UpdateBalance(ctx context.Context, userID int64, am
 	// Check if there's enough balance for debit operations
 	newBalance := currentBalance + amount
 	if newBalance < 0 {
+		_ = tx.Rollback()
 		return errors.New("insufficient funds")
 	}
 
@@ -210,7 +211,7 @@ func (r *PostgresRepository) SaveInboxMessage(ctx context.Context, tx *sqlx.Tx, 
 		VALUES ($1, $2, $3, $4, $5, $6, $7)
 		ON CONFLICT (message_id) DO NOTHING
 	`
-	
+
 	var err error
 	if tx != nil {
 		_, err = tx.ExecContext(
@@ -225,11 +226,11 @@ func (r *PostgresRepository) SaveInboxMessage(ctx context.Context, tx *sqlx.Tx, 
 			message.Processed, message.CreatedAt, message.UpdatedAt,
 		)
 	}
-	
+
 	if err != nil {
 		return fmt.Errorf("failed to save inbox message: %w", err)
 	}
-	
+
 	return nil
 }
 
@@ -241,13 +242,13 @@ func (r *PostgresRepository) GetUnprocessedInboxMessages(ctx context.Context, li
 		ORDER BY created_at ASC
 		LIMIT $1
 	`
-	
+
 	var messages []*models.InboxMessage
 	err := r.db.SelectContext(ctx, &messages, query, limit)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get unprocessed inbox messages: %w", err)
 	}
-	
+
 	return messages, nil
 }
 
@@ -258,18 +259,18 @@ func (r *PostgresRepository) MarkInboxMessageAsProcessed(ctx context.Context, tx
 		SET processed = true, updated_at = $1
 		WHERE message_id = $2
 	`
-	
+
 	var err error
 	if tx != nil {
 		_, err = tx.ExecContext(ctx, query, time.Now(), messageID)
 	} else {
 		_, err = r.db.ExecContext(ctx, query, time.Now(), messageID)
 	}
-	
+
 	if err != nil {
 		return fmt.Errorf("failed to mark inbox message as processed: %w", err)
 	}
-	
+
 	return nil
 }
 
@@ -279,7 +280,7 @@ func (r *PostgresRepository) SaveOutboxMessage(ctx context.Context, tx *sqlx.Tx,
 		INSERT INTO outbox (message_id, topic, key, value, sent, created_at, updated_at)
 		VALUES ($1, $2, $3, $4, $5, $6, $7)
 	`
-	
+
 	var err error
 	if tx != nil {
 		_, err = tx.ExecContext(
@@ -294,11 +295,11 @@ func (r *PostgresRepository) SaveOutboxMessage(ctx context.Context, tx *sqlx.Tx,
 			message.Sent, message.CreatedAt, message.UpdatedAt,
 		)
 	}
-	
+
 	if err != nil {
 		return fmt.Errorf("failed to save outbox message: %w", err)
 	}
-	
+
 	return nil
 }
 
@@ -310,13 +311,13 @@ func (r *PostgresRepository) GetUnsendOutboxMessages(ctx context.Context, limit 
 		ORDER BY created_at ASC
 		LIMIT $1
 	`
-	
+
 	var messages []*models.OutboxMessage
 	err := r.db.SelectContext(ctx, &messages, query, limit)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get unsent outbox messages: %w", err)
 	}
-	
+
 	return messages, nil
 }
 
@@ -327,12 +328,12 @@ func (r *PostgresRepository) MarkOutboxMessageAsSent(ctx context.Context, messag
 		SET sent = true, updated_at = $1
 		WHERE message_id = $2
 	`
-	
+
 	_, err := r.db.ExecContext(ctx, query, time.Now(), messageID)
 	if err != nil {
 		return fmt.Errorf("failed to mark outbox message as sent: %w", err)
 	}
-	
+
 	return nil
 }
 

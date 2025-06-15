@@ -169,11 +169,17 @@ func (p *OutboxPoller) pollOutbox(ctx context.Context) error {
 	// Send each message to Kafka
 	for _, message := range messages {
 		// Send the message to Kafka
-		err := p.writer.WriteMessages(ctx, kafka.Message{
-			Topic: message.Topic,
+		kafkaMsg := kafka.Message{
 			Key:   []byte(message.Key),
 			Value: message.Value,
-		})
+		}
+
+		// Only set the topic if it's not already set in the writer
+		if p.writer.Topic == "" {
+			kafkaMsg.Topic = message.Topic
+		}
+
+		err := p.writer.WriteMessages(ctx, kafkaMsg)
 		if err != nil {
 			log.Printf("Error sending message to Kafka: %v", err)
 			continue
